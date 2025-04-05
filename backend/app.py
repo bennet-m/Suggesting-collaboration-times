@@ -1,5 +1,6 @@
 from flask import Flask, redirect, request, session, jsonify
-from oauth import get_flow, get_credentials, fetch_calendar_events
+from oauth import get_flow, get_credentials, get_user_data
+from models import User
 
 app = Flask(__name__)
 app.secret_key = "dev-key"  
@@ -34,9 +35,10 @@ def oauth2callback():
 
 @app.route("/calendar")
 def calendar():
+    import json
     creds = get_credentials()
-    events = fetch_calendar_events(creds)
-    return jsonify(events)
+    user = get_user_data(creds)
+    return json.dumps(user.to_dict())
 
 if __name__ == "__main__":
     app.run(debug=True, host="localhost", port=5000)
