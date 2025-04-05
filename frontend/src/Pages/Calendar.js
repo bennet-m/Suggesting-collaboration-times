@@ -30,8 +30,8 @@ export default function Calendar() {
     const checkCalendarConnection = async () => {
         try {
             setLoading(true);
-            // Try to fetch calendar events with proper CORS configuration
-            const response = await fetch('http://localhost:5000/calendar', {
+            // Use consistent URL (127.0.0.1 instead of localhost)
+            const response = await fetch('http://127.0.0.1:5000/calendar', {
                 credentials: 'include', // This sends cookies
                 mode: 'cors',
                 headers: {
@@ -46,6 +46,11 @@ export default function Calendar() {
                 setConnected(true);
             } else if (response.status === 403) {
                 console.log('Not authenticated with Google Calendar yet');
+                setConnected(false);
+            } else {
+                // Handle other error responses
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Calendar API error:', response.status, errorData);
                 setConnected(false);
             }
         } catch (error) {
@@ -69,8 +74,8 @@ export default function Calendar() {
     };
 
     const handleConnectCalendar = () => {
-        // Open the login URL in a new tab to avoid CORS issues with redirects
-        window.open('http://localhost:5000/login', '_blank');
+        // Open the login URL directly to 127.0.0.1 instead of localhost
+        window.open('http://127.0.0.1:5000/login', '_blank');
         
         // Inform the user to check the new tab
         alert("Please complete the Google sign-in process in the new tab. After completing, return to this page and refresh to see your calendar data.");
@@ -155,7 +160,7 @@ export default function Calendar() {
                         </p>
                         <ul style={{ paddingLeft: '1.5rem' }}>
                             <li style={{ marginBottom: '0.5rem' }}>Make sure you're allowing cookies from our site</li>
-                            <li style={{ marginBottom: '0.5rem' }}>Try accessing the backend directly <a href="http://localhost:5000/login" target="_blank" rel="noopener noreferrer" style={{ color: '#007bff' }}>here</a></li>
+                            <li style={{ marginBottom: '0.5rem' }}>Try accessing the backend directly <a href="http://127.0.0.1:5000/login" target="_blank" rel="noopener noreferrer" style={{ color: '#007bff' }}>here</a></li>
                             <li style={{ marginBottom: '0.5rem' }}>After authorizing, return to this page and refresh</li>
                             <li>If issues persist, <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer" style={{ color: '#007bff' }}>manage your Google account permissions</a> and try again</li>
                         </ul>

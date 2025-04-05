@@ -2,8 +2,14 @@ from flask import Flask, redirect, request, session, jsonify
 from oauth import get_flow, get_credentials, get_user_data
 from models import User
 
+
 app = Flask(__name__)
-app.secret_key = "dev-key"  
+app.secret_key = "dev-key"
+
+# Update to allow both localhost and 127.0.0.1
+FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
+CORS(app, supports_credentials=True, origins=FRONTEND_URL)
+
 
 @app.route("/")
 def index():
@@ -31,7 +37,7 @@ def oauth2callback():
         "scopes": creds.scopes
     }
 
-    return redirect("/calendar")
+    return redirect(FRONTEND_URL[0])
 
 @app.route("/calendar")
 def calendar():
@@ -41,4 +47,5 @@ def calendar():
     return json.dumps(user.to_dict())
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=5000)
+    # Make sure to run on 127.0.0.1 not localhost to match frontend request
+    app.run(debug=True, host="127.0.0.1", port=5000)
