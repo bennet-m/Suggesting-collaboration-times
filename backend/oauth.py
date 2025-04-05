@@ -6,10 +6,10 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
 CLIENT_SECRETS_FILE = "secrets.json"
-SCOPES = ["https://www.googleapis.com/auth/calendar.events.readonly", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/calendar.app.created", "https://www.googleapis.com/auth/userinfo.profile"]
-REDIRECT_URI = "http://localhost:5000/oauth2callback"
+SCOPES = ["https://www.googleapis.com/auth/calendar.events.readonly", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/calendar.app.created", "https://www.googleapis.com/auth/userinfo.profile", "openid"]
+REDIRECT_URI = "http://127.0.0.1:5000/oauth2callback"
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # Only for local dev
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 def get_flow():
     flow = Flow.from_client_secrets_file(
