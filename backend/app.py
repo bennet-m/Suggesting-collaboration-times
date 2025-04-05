@@ -1,7 +1,7 @@
 from flask import Flask, redirect, request, session, jsonify
 from oauth import get_flow, get_credentials, get_user_data
 from models import User
-
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.secret_key = "dev-key"
