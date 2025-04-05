@@ -77,7 +77,7 @@ def get_user_data(creds):
     busy_times = []
     assignments = []
     for e in events:
-        if any(e == assignment for assignment in assignments):
+        if any(e["summary"] == assignment["summary"] and e["end"] == assignment["end"] for assignment in assignments):
             continue
         if "start" not in e or "dateTime" not in e["start"]:
             continue
