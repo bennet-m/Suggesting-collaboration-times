@@ -1,8 +1,15 @@
 from flask import Flask, redirect, request, session, jsonify
 from oauth import get_flow, get_credentials, fetch_calendar_events
+from flask_cors import CORS
+import os
 
 app = Flask(__name__)
-app.secret_key = "dev-key"  
+app.secret_key = "dev-key"
+
+# Update to allow both localhost and 127.0.0.1
+FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
+CORS(app, supports_credentials=True, origins=FRONTEND_URL)
+
 
 @app.route("/")
 def index():
@@ -30,13 +37,21 @@ def oauth2callback():
         "scopes": creds.scopes
     }
 
-    return redirect("/calendar")
+    return redirect(FRONTEND_URL[0])
 
 @app.route("/calendar")
 def calendar():
-    creds = get_credentials()
-    events = fetch_calendar_events(creds)
-    return jsonify(events)
+    try:
+        if "credentials" not in session:
+            return jsonify({"error": "Not authenticated"}), 403
+            
+        creds = get_credentials()
+        events = fetch_calendar_events(creds)
+        return jsonify(events)
+    except Exception as e:
+        app.logger.error(f"Error fetching calendar events: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=5000)
+    # Make sure to run on 127.0.0.1 not localhost to match frontend request
+    app.run(debug=True, host="127.0.0.1", port=5000)
