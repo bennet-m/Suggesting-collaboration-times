@@ -1,7 +1,75 @@
-import React from 'react';
-import { FaBook, FaCalendarAlt, FaClock, FaUsers, FaArrowRight } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaBook, FaCalendarAlt, FaClock, FaUsers, FaArrowRight, FaLightbulb, FaUserFriends } from 'react-icons/fa';
+import Marilyn from '../Assets/Images/Marilyn.png';
+import Bennet from '../Assets/Images/Bennet.png';
+import AJ from '../Assets/Images/AJ.png';
+import Nico from '../Assets/Images/Nico.png';
 
 export default function About() {
+    // Team member component with proper image fallback
+    const TeamMember = ({ member, index }) => {
+        const [imageError, setImageError] = useState(false);
+        
+        return (
+            <div key={index} style={{ 
+                textAlign: 'center', 
+                maxWidth: '180px',
+                background: 'white',
+                borderRadius: '12px',
+                padding: '1rem',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                transition: 'transform 0.3s ease',
+            }}>
+                <div style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    margin: '0 auto 1rem',
+                    background: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '3px solid #4285F4'
+                }}>
+                    {!imageError ? (
+                        <img 
+                            src={member.src} 
+                            alt={member.name} 
+                            style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                objectFit: 'cover'
+                            }} 
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <div style={{
+                            fontSize: '3rem',
+                            color: '#4285F4',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '100%'
+                        }}>
+                            {member.name.charAt(0)}
+                        </div>
+                    )}
+                </div>
+                <p style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>{member.name}</p>
+                <p style={{ fontSize: '0.9rem', color: '#666' }}>{member.role}</p>
+            </div>
+        );
+    };
+
+    // Team member data
+    const teamMembers = [
+        { name: 'Marilyn Ma (CMC \'27)', role: 'Backend Developer', src: Marilyn },
+        { name: 'Bennet Matazzoni (HMC \'26)', role: 'Backend Developer', src: Bennet },
+        { name: 'AJ Matheson-Lieber (CMC \'27)', role: 'UI/UX Designer and Frontend Developer', src: AJ },
+        { name: 'Nico Riley (CMC \'27)', role: 'UI/UX Designer and Frontend Developer', src: Nico }
+    ];
 
     return (
         <div className="about-container" style={{ 
@@ -40,12 +108,20 @@ export default function About() {
                 <p style={{ 
                     marginBottom: '2rem',
                     fontSize: '1.25rem',
-                    color: '#555'
+                    color: '#555',
+                    textAlign: 'center'
                 }}>
-                    StudySync is a collaboration platform designed to help students coordinate study sessions by finding the perfect time to work together on assignments.
+                    StudySync is a collaboration platform designed to help students coordinate study sessions 
+                    by finding the perfect time to work together on assignments.
                 </p>
                 
-                <section style={{ marginBottom: '3rem' }}>
+                {/* Our Mission Section */}
+                <section style={{ 
+                    marginBottom: '3rem',
+                    background: 'linear-gradient(to right, rgba(66, 133, 244, 0.05), rgba(52, 168, 83, 0.05))',
+                    padding: '2rem',
+                    borderRadius: '12px',
+                }}>
                     <h2 style={{ 
                         fontSize: '2rem', 
                         color: '#4285F4',
@@ -64,7 +140,7 @@ export default function About() {
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}>
-                            <FaBook />
+                            <FaLightbulb />
                         </span>
                         Our Mission
                     </h2>
@@ -72,44 +148,61 @@ export default function About() {
                         marginBottom: '1.5rem',
                         paddingLeft: '1rem',
                         borderLeft: '3px solid #4285F4',
+                        fontSize: '1.1rem'
                     }}>
-                        Our mission is to streamline the process of finding time to work on group assignments. By connecting to your Google Calendar, we automatically identify when you and your classmates are all available, making it easier than ever to schedule productive study sessions.
+                        Here at StudySync, we empower students by making collaboration easier than ever.
+                        Our algorithm analyzes user calendar data and suggests shared work times. This makes it 
+                        easier than ever to study together, plan group projects, and build meaningful academic connections.
+                    </p>
+                    <p style={{ 
+                        paddingLeft: '1rem',
+                        borderLeft: '3px solid #34A853',
+                        fontSize: '1.1rem'
+                    }}>
+                        By connecting to your Google Calendar, we automatically identify when you and your classmates 
+                        are all available, making it easier than ever to schedule productive study sessions.
                     </p>
                 </section>
-        <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-            <h1 style={{ fontSize: '2.5rem', color: '#4285F4', marginBottom: '1rem' }}>Our Mission</h1>
-            
-            <div style={{ marginTop: '2rem', lineHeight: '1.6' }}>
-                <p style={{ marginBottom: '1.5rem' }}>
-                    Here at StudySync, we empower students by making collaboration easier than ever.
-                    Our algorithm analyzes user calendar data and suggests shared work times. This makes it 
-                    easier than ever to study together, plan group projects, and build meaningful academic connections.
-                </p>
                 
-            <h2 style={{ fontSize: '1.8rem', marginTop: '2rem', color: '#4285F4' }}>Meet the Team</h2>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
-                {[
-                    { name: 'Marilyn Ma (CMC ’27)', src: '/images/placeholder.jpg' },
-                    { name: 'Bennet Matazzoni (HMC ’26)', src: '/images/placeholder.jpg' },
-                    { name: 'AJ Matheson-Lieber (CMC ’27)', src: '/images/placeholder.jpg' },
-                    { name: 'Nico Riley (CMC ’27)', src: '/images/placeholder.jpg' }
-                ].map((member, i) => (
-                    <div key={i} style={{ textAlign: 'center', maxWidth: '150px' }}>
-                        <img 
-                            src={member.src} 
-                            alt={member.name} 
-                            style={{ 
-                                width: '100%', 
-                                height: 'auto', 
-                                borderRadius: '8px', 
-                                marginBottom: '0.5rem' 
-                            }} 
-                        />
-                        <p style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{member.name}</p>
+                {/* Meet the Team Section */}
+                <section style={{ marginBottom: '3rem' }}>
+                    <h2 style={{ 
+                        fontSize: '2rem', 
+                        color: '#4285F4',
+                        marginBottom: '1.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{
+                            background: '#4285F4',
+                            color: 'white',
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <FaUserFriends />
+                        </span>
+                        Meet the Team
+                    </h2>
+                    <div style={{ 
+                        display: 'flex', 
+                        flexWrap: 'wrap', 
+                        justifyContent: 'center', 
+                        gap: '2rem', 
+                        marginBottom: '2rem' 
+                    }}>
+                        {teamMembers.map((member, i) => (
+                            <TeamMember key={i} member={member} index={i} />
+                        ))}
                     </div>
-                ))}
-            </div>
+                </section>
                 
+                {/* Key Features Section */}
                 <section style={{
                     marginBottom: '3rem',
                     background: '#f8f9fa',
@@ -139,62 +232,39 @@ export default function About() {
                         </span>
                         Key Features
                     </h2>
-                    <ul style={{ 
-                        listStyleType: 'none', 
-                        marginLeft: '0.5rem', 
-                        marginBottom: '1.5rem'
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                        gap: '1.5rem'
                     }}>
-                        <li style={{ 
-                            marginBottom: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem'
-                        }}>
-                            <div style={{
-                                color: '#34A853',
-                                fontSize: '1.2rem'
-                            }}><FaBook /></div>
-                            Track assignments and due dates
-                        </li>
-                        <li style={{ 
-                            marginBottom: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem'
-                        }}>
-                            <div style={{
-                                color: '#34A853',
-                                fontSize: '1.2rem'
-                            }}><FaCalendarAlt /></div>
-                            Connect with Google Calendar for availability
-                        </li>
-                        <li style={{ 
-                            marginBottom: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem'
-                        }}>
-                            <div style={{
-                                color: '#34A853',
-                                fontSize: '1.2rem'
-                            }}><FaClock /></div>
-                            Find matching free time slots with classmates
-                        </li>
-                        <li style={{ 
-                            marginBottom: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem'
-                        }}>
-                            <div style={{
-                                color: '#34A853',
-                                fontSize: '1.2rem'
-                            }}><FaUsers /></div>
-                            Organize study sessions around shared assignments
-                        </li>
-                    </ul>
+                        {[
+                            { icon: <FaBook />, text: 'Track assignments and due dates' },
+                            { icon: <FaCalendarAlt />, text: 'Connect with Google Calendar for availability' },
+                            { icon: <FaClock />, text: 'Find matching free time slots with classmates' },
+                            { icon: <FaUsers />, text: 'Organize study sessions around shared assignments' }
+                        ].map((feature, i) => (
+                            <div key={i} style={{
+                                padding: '1.5rem',
+                                background: 'white',
+                                borderRadius: '10px',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                textAlign: 'center'
+                            }}>
+                                <div style={{
+                                    color: '#34A853',
+                                    fontSize: '2rem'
+                                }}>{feature.icon}</div>
+                                <div>{feature.text}</div>
+                            </div>
+                        ))}
+                    </div>
                 </section>
                 
+                {/* How It Works Section */}
                 <section style={{ marginBottom: '3rem' }}>
                     <h2 style={{ 
                         fontSize: '2rem', 
@@ -218,14 +288,24 @@ export default function About() {
                         </span>
                         How It Works
                     </h2>
-                    <p style={{ marginBottom: '1.5rem' }}>
-                        StudySync uses Google Calendar integration to fetch your schedule and identify free time slots. It then matches your availability with other students working on the same assignments to suggest optimal collaboration times.
-                    </p>
-                    <ol style={{ 
-                        marginLeft: '0', 
+                    <p style={{ 
                         marginBottom: '1.5rem',
-                        counterReset: 'step-counter',
-                        listStyleType: 'none'
+                        fontSize: '1.1rem',
+                        maxWidth: '800px',
+                        margin: '0 auto 2rem',
+                        textAlign: 'center',
+                        color: '#555'
+                    }}>
+                        StudySync uses Google Calendar integration to fetch your schedule and identify free time slots. 
+                        It then matches your availability with other students working on the same assignments 
+                        to suggest optimal collaboration times.
+                    </p>
+                    <div style={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem',
+                        maxWidth: '700px',
+                        margin: '0 auto'
                     }}>
                         {[
                             'Add your assignments to the platform',
@@ -234,17 +314,19 @@ export default function About() {
                             'Find matching times with classmates',
                             'Schedule and organize productive study sessions'
                         ].map((step, index) => (
-                            <li key={index} style={{ 
-                                marginBottom: '1rem',
+                            <div key={index} style={{ 
                                 display: 'flex',
-                                alignItems: 'center',
+                                alignItems: 'flex-start',
                                 gap: '1rem',
-                                counterIncrement: 'step-counter'
+                                padding: '1rem',
+                                background: index % 2 === 0 ? 'rgba(66, 133, 244, 0.05)' : 'rgba(52, 168, 83, 0.05)',
+                                borderRadius: '8px',
+                                transition: 'transform 0.2s ease',
                             }}>
                                 <div style={{
-                                    background: '#4285F4',
+                                    background: index % 2 === 0 ? '#4285F4' : '#34A853',
                                     color: 'white',
-                                    width: '30px',
+                                    minWidth: '30px',
                                     height: '30px',
                                     borderRadius: '50%',
                                     display: 'flex',
@@ -254,13 +336,18 @@ export default function About() {
                                 }}>
                                     {index + 1}
                                 </div>
-                                {step}
-                            </li>
+                                <div style={{
+                                    fontSize: '1.1rem'
+                                }}>
+                                    {step}
+                                </div>
+                            </div>
                         ))}
-                    </ol>
+                    </div>
                 </section>
             </div>
             
+            {/* CTA Section */}
             <div style={{ 
                 marginTop: '4rem', 
                 background: 'linear-gradient(135deg, #4285F4, #34A853)',
