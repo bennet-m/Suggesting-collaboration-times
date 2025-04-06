@@ -11,7 +11,7 @@ import os
 app = Flask(__name__)
 app.secret_key = "dev-key"
 
-# Update to allow both localhost and 127.0.0.1
+# Update to use HTTP for local development
 FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
 CORS(app, supports_credentials=True, origins=FRONTEND_URL)
 
@@ -40,30 +40,68 @@ def oauth2callback():
         "client_secret": creds.client_secret,
         "scopes": creds.scopes
     }
-    return main_logic()
     
-def main_logic():
-    creds = get_credentials()
+    # Get user data from Google
     user = get_user_data(creds)
     send_user(user)
-    suggestions = get_suggestions(user)
-    return jsonify(suggestions)
+    
+    # Redirect back to frontend with success
+    return redirect(f"{FRONTEND_URL[0]}/?auth=success")
+
+@app.route("/api/user/current", methods=["GET"])
+def get_current_user():
+    try:
+        print("Attempting to get credentials...")
+        creds = get_credentials()
+        print("Got credentials, getting user data...")
+        user = get_user_data(creds)
+        print(f"Got user data: {user.name}, {user.email}")
+        
+        # Initialize empty lists for assignments and free_time if they don't exist
+        assignments = []
+        free_time = []
+        
+        # If the user object has these attributes, use them
+        if hasattr(user, 'assignments'):
+            assignments = [{"title": a["title"], "due": a["due"].isoformat()} for a in user.assignments]
+        if hasattr(user, 'free_time'):
+            free_time = [{"start": t["start"].isoformat(), "end": t["end"].isoformat()} for t in user.free_time]
+        
+        response_data = {
+            "name": user.name,
+            "email": user.email,
+            "assignments": assignments,
+            "free_time": free_time
+        }
+        print(f"Sending response: {response_data}")
+        return jsonify(response_data)
+    except Exception as e:
+        print(f"Error in get_current_user: {str(e)}")
+        return jsonify({"error": str(e)}), 401
 
 @app.route("/api/suggestions", methods=["POST"])
 def get_suggestions_endpoint():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-
-    user = {
-        "name": data.get("name"),
-        "email": data.get("email"),
-        "assignments": data.get("assignments", []),
-        "free_time": data.get("free_time", [])
-    }
-
-    suggestions = get_suggestions(user)
-    return jsonify({"suggestions": suggestions})
+    try:
+        print("Getting suggestions...")
+        creds = get_credentials()
+        user = get_user_data(creds)
+        print(f"Got user data for suggestions: {user.name}, {user.email}")
+        
+        # Initialize empty lists if they don't exist
+        if not hasattr(user, 'assignments'):
+            user.assignments = []
+        if not hasattr(user, 'free_time'):
+            user.free_time = []
+            
+        print(f"User assignments: {len(user.assignments)}, free time slots: {len(user.free_time)}")
+        
+        suggestions = get_suggestions(user)
+        print(f"Generated {len(suggestions)} suggestions")
+        
+        return jsonify({"suggestions": suggestions})
+    except Exception as e:
+        print(f"Error in get_suggestions_endpoint: {str(e)}")
+        return jsonify({"error": str(e)}), 401
 
 @app.route("/api/user", methods=["POST"])
 def create_user_endpoint():

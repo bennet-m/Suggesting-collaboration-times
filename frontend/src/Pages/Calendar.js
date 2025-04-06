@@ -30,7 +30,7 @@ export default function Calendar() {
     const checkCalendarConnection = async () => {
         try {
             setLoading(true);
-            // Use consistent URL (127.0.0.1 instead of localhost)
+            // Use HTTP URL for local development
             const response = await fetch('http://127.0.0.1:5000/calendar', {
                 credentials: 'include', // This sends cookies
                 mode: 'cors',
@@ -74,7 +74,7 @@ export default function Calendar() {
     };
 
     const handleConnectCalendar = () => {
-        // Open the login URL directly to 127.0.0.1 instead of localhost
+        // Open the login URL directly to HTTP
         window.open('http://127.0.0.1:5000/login', '_blank');
         
         // Inform the user to check the new tab

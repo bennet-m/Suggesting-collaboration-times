@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SuggestedMeeting from "../Components/SuggestedMeeting";
+import backgroundImage from '../Assets/Images/Bookclp.png';
 
 // Color schemes based on different themes
 const colorSchemes = {
@@ -85,105 +86,84 @@ const formatAttendeesWithEmails = (attendeeNames) => {
   }).join(', ');
 };
 
-export default function Dashboard() {
+export default function Dashboard({ userData }) {
   // State to track upcoming meetings
-  const [upcomingMeetings, setUpcomingMeetings] = useState([
-    // Pre-populate with one example meeting
-    {
-      id: 'existing-1',
-      title: "CS Final Review",
-      date: `Fri, April 19, ${currentYear}`,
-      time: "4 PM - 6 PM",
-      dueDate: `April 22, ${currentYear}`,
-      assignment: "CS Final",
-      attendees: formatAttendeesWithEmails("Nico, AJ, Bennet"),
-      location: "Kravis Center, Room 321",
-      colorScheme: colorSchemes.upcoming,
-      isNew: false
-    }
-  ]);
+  const [upcomingMeetings, setUpcomingMeetings] = useState([]);
+  const [suggestedMeetings, setSuggestedMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // State to track all suggested meetings (so we can filter out accepted ones)
-  const [suggestedMeetings, setSuggestedMeetings] = useState([
-    {
-      id: 'suggested-1',
-      title: "Partner Work Sesh",
-      date: `Sun, April 12, ${currentYear}`,
-      time: "7 PM - 9 PM",
-      dueDate: `April 17, ${currentYear}`,
-      assignment: "HW 6",
-      attendees: formatAttendeesWithEmails("Nico, Marilyn, AJ, Bennet"),
-      location: "Millikan Lab, Room 2024",
-      colorScheme: colorSchemes.study
-    },
-    {
-      id: 'suggested-2',
-      title: "Project Sync",
-      date: `Mon, April 14, ${currentYear}`,
-      time: "1 PM - 2 PM",
-      dueDate: `April 16, ${currentYear}`,
-      assignment: "Project 3",
-      attendees: formatAttendeesWithEmails("Farah, John, Jane"),
-      location: "Zoom: https://zoom.us/j/123456789",
-      colorScheme: colorSchemes.project
-    },
-    {
-      id: 'suggested-3',
-      title: "Reading Group",
-      date: `Tue, April 15, ${currentYear}`,
-      time: "5 - 6 PM",
-      dueDate: `April 18, ${currentYear}`,
-      assignment: "Reading 4",
-      attendees: formatAttendeesWithEmails("Jenny, Sabrina, Eli, Dana"),
-      location: "Library Study Room 303",
-      colorScheme: colorSchemes.event
-    },
-    {
-      id: 'suggested-4',
-      title: "Final Review",
-      date: `Wed, April 16, ${currentYear}`,
-      time: "3 PM - 5 PM",
-      dueDate: `April 19, ${currentYear}`,
-      assignment: "Final Exam",
-      attendees: formatAttendeesWithEmails("Jim, Bob, Alice, Charlie"),
-      location: "Academic Building, Room 101",
-      colorScheme: colorSchemes.deadline
-    },
-    {
-      id: 'suggested-5',
-      title: "Study Break Coffee",
-      date: `Thu, April 17, ${currentYear}`,
-      time: "10 AM - 11 AM",
-      dueDate: "No deadline",
-      assignment: "Social",
-      attendees: formatAttendeesWithEmails("Dana, Eli, Sabrina, Jenny"),
-      location: "Campus Coffee Shop",
-      colorScheme: colorSchemes.casual
-    }
-  ]);
-  
-  // State to track if a confirmation message should be shown
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [confirmationMessage, setConfirmationMessage] = useState('');
-  
-  // Effect to automatically hide confirmation after 3 seconds
   useEffect(() => {
-    if (showConfirmation) {
-      const timer = setTimeout(() => {
-        setShowConfirmation(false);
-      }, 3000);
-      
-      return () => clearTimeout(timer);
+    const fetchSuggestions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching suggestions for user:", userData);
+        
+        const response = await fetch('http://127.0.0.1:5000/api/suggestions', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        console.log("Suggestions response status:", response.status);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch suggestions: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Suggestions data received:", data);
+        
+        if (!data.suggestions || !Array.isArray(data.suggestions)) {
+          throw new Error('Invalid suggestions data received');
+        }
+
+        // Transform the suggestions into the format expected by the UI
+        const formattedSuggestions = data.suggestions.map((suggestion, index) => {
+          const startDate = new Date(suggestion.start);
+          const endDate = new Date(suggestion.end);
+          const dueDate = new Date(suggestion.due);
+          
+          return {
+            id: `suggested-${index}`,
+            title: suggestion.assignment,
+            date: startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }),
+            time: `${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+            dueDate: dueDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            assignment: suggestion.assignment,
+            attendees: formatAttendeesWithEmails("Classmates"),
+            location: "To be determined",
+            colorScheme: colorSchemes.study
+          };
+        });
+
+        console.log("Formatted suggestions:", formattedSuggestions);
+        setSuggestedMeetings(formattedSuggestions);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userData) {
+      console.log("User data available, fetching suggestions");
+      fetchSuggestions();
+    } else {
+      console.log("No user data available, skipping suggestions fetch");
+      setLoading(false);
     }
-  }, [showConfirmation]);
-  
+  }, [userData]);
+
   // Function to check if a meeting has already been added to upcoming
   const isMeetingAlreadyAdded = (meetingId) => {
     return upcomingMeetings.some(
       upcomingMeeting => 
-        // If the meeting was explicitly added from suggested
         upcomingMeeting.originalId === meetingId || 
-        // Match by assignment name and date as fallback
         (upcomingMeeting.assignment === suggestedMeetings.find(m => m.id === meetingId)?.assignment && 
          upcomingMeeting.date === suggestedMeetings.find(m => m.id === meetingId)?.date)
     );
@@ -191,23 +171,15 @@ export default function Dashboard() {
   
   // Function to add a meeting to upcoming meetings
   const handleAddToUpcoming = (meeting) => {
-    // Create a copy of the meeting with a unique ID
     const upcomingMeeting = {
       ...meeting,
-      id: `meeting-${Date.now()}`, // Create a unique ID based on timestamp
-      originalId: meeting.id, // Track which suggested meeting this came from
-      colorScheme: colorSchemes.upcoming, // Use upcoming color scheme
-      isNew: true // Mark as new for animation
+      id: `meeting-${Date.now()}`,
+      originalId: meeting.id,
+      colorScheme: colorSchemes.upcoming,
+      isNew: true
     };
     
-    // Add to upcoming meetings state
     setUpcomingMeetings(prev => [...prev, upcomingMeeting]);
-    
-    // Show confirmation message
-    setConfirmationMessage(`Added ${meeting.assignment} to your meetings`);
-    setShowConfirmation(true);
-    
-    console.log(`Added ${meeting.assignment} to upcoming meetings`);
     
     // Remove the "new" flag after animation finishes
     setTimeout(() => {
@@ -220,12 +192,6 @@ export default function Dashboard() {
   // Function to remove a meeting from upcoming meetings
   const handleRemoveMeeting = (id, assignmentName) => {
     setUpcomingMeetings(prev => prev.filter(meeting => meeting.id !== id));
-    
-    // Show confirmation message
-    setConfirmationMessage(`Removed ${assignmentName} from your meetings`);
-    setShowConfirmation(true);
-    
-    console.log(`Removed meeting ${id} from upcoming meetings`);
   };
 
   return (
@@ -237,75 +203,85 @@ export default function Dashboard() {
       minHeight: '100vh',
       position: 'relative'
     }}>
-      {/* Confirmation message */}
-      {showConfirmation && (
+      {/* Loading state */}
+      {loading && (
         <div style={{
-          position: 'fixed',
-          bottom: '30px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '12px 24px',
-          borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-          zIndex: 100,
-          animation: 'fadeInUp 0.3s ease forwards',
-          fontSize: '16px',
-          fontWeight: '500'
-        }}>
-          {confirmationMessage}
-        </div>
-      )}
-      
-      {/* Suggested Meetings Section */}
-      <h1 style={{ 
-        fontSize: '3rem', 
-        color: '#4285F4', 
-        marginBottom: '1.5rem', 
-        textAlign: 'left',
-        fontWeight: '700',
-        borderBottom: '3px solid #e1e4e8',
-        paddingBottom: '0.5rem'
-      }}>
-        Suggested
-      </h1>
-
-      {/* Filter out meetings that have already been added to upcoming */}
-      {suggestedMeetings
-        .filter(meeting => !isMeetingAlreadyAdded(meeting.id))
-        .map(meeting => (
-          <div key={meeting.id} style={{ marginBottom: '24px' }}>
-            <SuggestedMeeting
-              suggestedMeeting={{
-                title: meeting.title,
-                date: meeting.date,
-                time: meeting.time,
-                dueDate: meeting.dueDate,
-                assignment: meeting.assignment,
-                attendees: meeting.attendees,
-                location: meeting.location
-              }}
-              colorScheme={meeting.colorScheme}
-              onAdd={() => handleAddToUpcoming(meeting)}
-            />
-          </div>
-        ))
-      }
-      
-      {/* Message when all suggested meetings have been added */}
-      {suggestedMeetings.every(meeting => isMeetingAlreadyAdded(meeting.id)) && (
-        <div style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.05)',
-          padding: '2rem',
-          borderRadius: '12px',
           textAlign: 'center',
-          color: '#666',
+          padding: '2rem',
+          backgroundColor: 'rgba(0, 0, 0, 0.05)',
+          borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.5rem' }}>All caught up!</h3>
-          <p style={{ margin: 0, fontSize: '1rem' }}>You've added all suggested meetings to your calendar.</p>
+          <h3>Loading suggestions...</h3>
+          <p>Please wait while we find the best times for collaboration.</p>
         </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div style={{
+          textAlign: 'center',
+          padding: '2rem',
+          backgroundColor: 'rgba(255, 0, 0, 0.1)',
+          borderRadius: '12px',
+          marginBottom: '2rem',
+          color: '#721c24'
+        }}>
+          <h3>Error loading suggestions</h3>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {/* Suggested Meetings Section */}
+      {!loading && !error && (
+        <>
+          <h1 style={{ 
+            fontSize: '3rem', 
+            color: '#4285F4', 
+            marginBottom: '1.5rem', 
+            textAlign: 'left',
+            fontWeight: '700',
+            borderBottom: '3px solid #e1e4e8',
+            paddingBottom: '0.5rem'
+          }}>
+            Suggested
+          </h1>
+
+          {suggestedMeetings
+            .filter(meeting => !isMeetingAlreadyAdded(meeting.id))
+            .map(meeting => (
+              <div key={meeting.id} style={{ marginBottom: '24px' }}>
+                <SuggestedMeeting
+                  suggestedMeeting={{
+                    title: meeting.title,
+                    date: meeting.date,
+                    time: meeting.time,
+                    dueDate: meeting.dueDate,
+                    assignment: meeting.assignment,
+                    attendees: meeting.attendees,
+                    location: meeting.location
+                  }}
+                  colorScheme={meeting.colorScheme}
+                  onAdd={() => handleAddToUpcoming(meeting)}
+                />
+              </div>
+            ))
+          }
+          
+          {suggestedMeetings.every(meeting => isMeetingAlreadyAdded(meeting.id)) && (
+            <div style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              padding: '2rem',
+              borderRadius: '12px',
+              textAlign: 'center',
+              color: '#666',
+              marginBottom: '2rem'
+            }}>
+              <h3>All caught up!</h3>
+              <p>You've added all suggested meetings to your calendar.</p>
+            </div>
+          )}
+        </>
       )}
       
       {/* Upcoming Meetings Section */}
@@ -330,10 +306,6 @@ export default function Dashboard() {
                 from { opacity: 0; transform: translateY(20px); }
                 to { opacity: 1; transform: translateY(0); }
               }
-              @keyframes fadeInUp {
-                from { opacity: 0; transform: translate(-50%, 20px); }
-                to { opacity: 1; transform: translate(-50%, 0); }
-              }
               .new-meeting {
                 animation: fadeIn 0.5s ease forwards;
               }
@@ -349,7 +321,6 @@ export default function Dashboard() {
               }}
               className={meeting.isNew ? 'new-meeting' : ''}
             >
-              {/* Remove button */}
               <button
                 onClick={() => handleRemoveMeeting(meeting.id, meeting.assignment)}
                 style={{
