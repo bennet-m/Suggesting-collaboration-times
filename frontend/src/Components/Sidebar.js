@@ -170,15 +170,33 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                 const groups = await userService.getStudyGroups();
                 setStudyGroups(groups);
                 
-                // Mock classmates data
-                const mockClassmates = allUsers
-                    .filter(user => user.name !== (currentUser?.name || ''))
-                    .slice(0, 3) // Just take first 3 users as classmates for demo
-                    .map(user => ({...user, class: 'CS 101'})); // Add class info
+                // Get classmates using the new API
+                const classmatesData = await userService.getClassmates(userEmail);
                 
-                setClassmates(mockClassmates);
+                // Convert classmates data to array format
+                const classmatesArray = [];
+                for (const [className, students] of Object.entries(classmatesData)) {
+                    students.forEach(student => {
+                        if (!classmatesArray.some(c => c.email === student.email)) {
+                            classmatesArray.push({
+                                ...student,
+                                class: className
+                            });
+                        }
+                    });
+                }
+                
+                setClassmates(classmatesArray);
             } catch (error) {
                 console.error('Error loading data:', error);
+                
+                // Set default classmates data if there's an error
+                const mockClassmates = users
+                    .filter(user => user.name !== (userData?.name || ''))
+                    .slice(0, 3)
+                    .map(user => ({...user, class: 'CS 101'}));
+                
+                setClassmates(mockClassmates);
             }
         };
         

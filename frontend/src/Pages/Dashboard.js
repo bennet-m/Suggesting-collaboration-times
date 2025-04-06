@@ -186,16 +186,33 @@ export default function Dashboard() {
   // Function to fetch user data from the backend
   const fetchUserDataFromBackend = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/current-user`, {
+      // Get the user email from localStorage
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!userEmail) {
+        console.error('No user email found in localStorage');
+        return null;
+      }
+      
+      // Try with email parameter directly
+      const encodedEmail = encodeURIComponent(userEmail);
+      const response = await fetch(`${BACKEND_URL}/api/current-user?email=${encodedEmail}`, {
         method: 'GET',
         credentials: 'include', // Include cookies for session
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors'
       });
       
       if (!response.ok) {
+        console.error(`Failed to fetch user data: ${response.status}`);
         return null;
       }
       
       const data = await response.json();
+      console.log('Backend response:', data); // Add logging to see the response
       
       // If we got valid user data
       if (data.user) {

@@ -93,9 +93,22 @@ const Login = ({ setAuthenticated }) => {
         }
     };
 
-    const handleGoogleCalendarConnect = () => {
-        // Redirect to backend login endpoint for Google OAuth flow
+    const handleGoogleCalendarConnect = async () => {
+        // First try to logout any existing sessions
         const BACKEND_URL = 'http://127.0.0.1:5000';
+        try {
+            // Clear any existing session
+            await fetch(`${BACKEND_URL}/logout`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            console.log('Cleared any existing session');
+        } catch (error) {
+            console.error('Error clearing session:', error);
+            // Continue anyway
+        }
+        
+        // Redirect to backend login endpoint for Google OAuth flow
         window.location.href = `${BACKEND_URL}/login`;
     };
 

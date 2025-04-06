@@ -30,23 +30,36 @@ def get_flow():
 
 def get_credentials():
     creds = None
-    # Try to load from token.pickle (your cached creds)
-    if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as token:
-            creds = pickle.load(token)
+    try:
+        # Try to load from token.pickle (your cached creds)
+        if os.path.exists("token.pickle"):
+            print("Loading credentials from token.pickle")
+            with open("token.pickle", "rb") as token:
+                creds = pickle.load(token)
 
-    # If no valid creds, use session
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        elif "credentials" in session:
+        # If no valid creds, use session
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                print("Refreshing expired credentials")
+                creds.refresh(Request())
+            elif "credentials" in session:
+                print("Loading credentials from session")
+                creds = Credentials(**session["credentials"])
+            else:
+                print("No valid credentials found")
+                raise Exception("No valid credentials found")
+
+            # Save back to token.pickle
+            print("Saving credentials to token.pickle")
+            with open("token.pickle", "wb") as token:
+                pickle.dump(creds, token)
+    except Exception as e:
+        print(f"Error loading credentials: {str(e)}")
+        if "credentials" in session:
+            print("Falling back to session credentials after error")
             creds = Credentials(**session["credentials"])
         else:
-            raise Exception("No valid credentials found")
-
-        # Save back to token.pickle
-        with open("token.pickle", "wb") as token:
-            pickle.dump(creds, token)
+            raise
 
     return creds
 
