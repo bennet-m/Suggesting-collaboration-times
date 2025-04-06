@@ -23,12 +23,6 @@ function Navbar() {
           <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Dashboard</Link>
         </li>
         <li>
-          <Link to="/assignments" style={{ color: 'white', textDecoration: 'none' }}>Assignments</Link>
-        </li>
-        <li>
-          <Link to="/calendar" style={{ color: 'white', textDecoration: 'none' }}>Calendar</Link>
-        </li>
-        <li>
           <Link to="/about" style={{ color: 'white', textDecoration: 'none' }}>About</Link>
         </li>
       </ul>
