@@ -3,6 +3,7 @@ from models import User
 from flask_cors import CORS
 from datetime import datetime
 from slugify import slugify
+import json
 
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -145,16 +146,30 @@ def send_user(user: User):
         create_user_firestore(user.name, user.email)
     
     for assignment in user.assignments:
-        due = assignment.get("end")
+        title = assignment.get("title") or assignment.get("summary")
+        due = assignment.get("due") or assignment.get("end")
+
+        if not title or not due:
+            continue  # skip invalid assignments
+
         if isinstance(due, str):
             due = datetime.fromisoformat(due)
-        add_assignment_to_user(user.email, assignment.get("title", assignment.get("summary")), due)
+
+        add_assignment_to_user(user.email, title, due)
     
-    for start, end in user.free_time:
+    for block in user.free_time: #changed this to account for every free
+        start = block.get("start")
+        end = block.get("end")
+
+        if not start or not end:
+            continue  # skip bad blocks
+
+        # Convert to datetime if needed
         if isinstance(start, str):
             start = datetime.fromisoformat(start)
         if isinstance(end, str):
             end = datetime.fromisoformat(end)
+
         add_free_time_to_user(user.email, start, end)
 
 # get all free times before an assignment due date
@@ -222,7 +237,7 @@ def get_suggestions(user: User):
     suggestions = []
 
     for assignment in user.assignments:
-        title = assignment.get("title", assignment.get("summary"))
+        title = assignment.get("title")
         due = assignment.get("due")
         if isinstance(due, str):
             due = datetime.fromisoformat(due)
@@ -246,3 +261,29 @@ def get_suggestions(user: User):
             })
 
     return suggestions
+
+
+
+""" # Load users from JSON and upload using your existing helper functions
+def upload_users_from_json(filepath):
+    with open(filepath, "r") as f:
+        data = json.load(f)
+
+    for user in data["users"]:
+        name = user["name"]
+        email = user["email"]
+        assignments = user.get("assignments", [])
+        free_times = user.get("free_time", [])
+
+        create_user_firestore(name, email)
+
+        for assignment in assignments:
+            add_assignment_to_user(email, assignment["title"], assignment["due"])
+
+        for block in free_times:
+            add_free_time_to_user(email, block["start"], block["end"])
+
+    print("✅ All users uploaded successfully!")
+
+upload_users_from_json("./db/users.json") """
+
