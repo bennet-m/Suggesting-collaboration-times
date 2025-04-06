@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import backgroundImage from '../Assets/Images/Bookclp.png';
 
-const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
+
+
+const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme, isUpcoming }) => {
   const colors = colorScheme;
   const [showTooltip, setShowTooltip] = useState(false);
+  const DEFAULT_MEETING_DURATION = 1; // 1 default meeting time
   
-  // Google Calendar icon SVG (simple representation)
+  // Basic Google Calendar icon SVG (Thank you Claude)
   const CalendarIcon = () => (
     <svg 
       width="18" 
@@ -38,6 +41,26 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
       />
       <path 
         d="M3 10H21" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+  
+  // Check Icon SVG for upcoming meetings
+  const CheckIcon = () => (
+    <svg 
+      width="18" 
+      height="18" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ marginRight: '8px' }}
+    >
+      <path 
+        d="M20 6L9 17L4 12" 
         stroke="currentColor" 
         strokeWidth="2" 
         strokeLinecap="round" 
@@ -80,20 +103,9 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
         attendeesParam = emails.map(email => `&add=${encodeURIComponent(email)}`).join('');
       }
       
-      console.log('Extracted emails for calendar invite:', emails);
     }
     
     try {
-      // Debug info
-      console.log('Date:', suggestedMeeting.date);
-      console.log('Time:', suggestedMeeting.time);
-      console.log('Assignment:', suggestedMeeting.assignment);
-      console.log('Attendees (display format):', suggestedMeeting.attendees
-        .split(',')
-        .map(attendee => attendee.trim().split('<')[0].trim())
-        .join(', '));
-      console.log('Location:', suggestedMeeting.location || 'Not specified');
-      console.log('Due Date:', suggestedMeeting.dueDate);
       
       // Calculate default time (now + 1 hour for duration)
       const now = new Date();
@@ -112,10 +124,10 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
         return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${description}${attendeesParam}`;
       };
       
-      // Try our best to parse the provided date and time
-      // Get current date if date parsing fails
+      // Try to parse the provided date and time
+      // Get current date if date parsing fails lol
       const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setDate(tomorrow.getDate() + DEFAULT_MEETING_DURATION);
       
       // Create default start and end dates
       let startDate = new Date(now);
@@ -130,27 +142,29 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
       
       if (dateStr && timeRange) {
         try {
-          // DEBUG: Log the input formats
-          console.log('Raw dateStr:', dateStr);
-          console.log('Raw timeRange:', timeRange);
-          
+
           // Clean the date string - remove any ordinal suffixes if present (1st, 2nd, 3rd, etc.)
           const cleanDateStr = dateStr.replace(/(\d+)(st|nd|rd|th)/, '$1');
-          console.log('Cleaned dateStr:', cleanDateStr);
           
           // Clean dates a bit more
           const veryCleanDateStr = cleanDateStr
             .replace(/\s+/g, ' ')           // normalize spaces
             .trim();
           
-          console.log('Very clean dateStr:', veryCleanDateStr);
           
           // Try multiple date parsing approaches
           let parsedDate;
           
           // Approach 1: Direct parsing
           parsedDate = new Date(veryCleanDateStr);
-          console.log('Direct parse result:', parsedDate, 'valid:', !isNaN(parsedDate.getTime()));
+          
+          // If we got a valid date, check if year needs fixing
+          if (!isNaN(parsedDate.getTime())) {
+            const currentYear = new Date().getFullYear();
+            if (parsedDate.getFullYear() < currentYear - 10 || parsedDate.getFullYear() > currentYear + 10) {
+              parsedDate.setFullYear(currentYear);
+            }
+          }
           
           // Approach 2: If date looks like "May 15, 2023" or similar format
           if (isNaN(parsedDate.getTime()) && /[A-Za-z]+\s+\d+,\s+\d{4}/.test(cleanDateStr)) {
@@ -162,7 +176,6 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
                                   "July":6, "August":7, "September":8, "October":9, "November":10, "December":11};
               const monthIndex = monthNames[month] || 0;
               parsedDate = new Date(parseInt(year), monthIndex, parseInt(day));
-              console.log('US format parse result:', parsedDate, 'valid:', !isNaN(parsedDate.getTime()));
             }
           }
           
@@ -219,12 +232,16 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
             for (const { regex, parser } of datePatterns) {
               const match = veryCleanDateStr.match(regex);
               if (match) {
-                console.log('Matched date pattern:', regex, match);
                 try {
                   const result = parser(match);
                   if (!isNaN(result.getTime())) {
+                    // Fix year if it's far in the past or future
+                    const currentYear = new Date().getFullYear();
+                    if (result.getFullYear() < currentYear - 10 || result.getFullYear() > currentYear + 10) {
+                      result.setFullYear(currentYear);
+                    }
+                    
                     parsedDate = result;
-                    console.log('Parsed date using pattern:', parsedDate);
                     break;
                   }
                 } catch (err) {
@@ -239,13 +256,18 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
             // Important: Set this AFTER we confirm we have a valid date
             usedFallbackDates = false; // We have a real date now
             
+            // Fix year if it's far in the past or future (likely wrong year parsing)
+            const currentYear = new Date().getFullYear();
+            if (parsedDate.getFullYear() < currentYear - 10 || parsedDate.getFullYear() > currentYear + 10) {
+              console.log('Detected incorrect year:', parsedDate.getFullYear(), 'fixing to current year:', currentYear);
+              parsedDate.setFullYear(currentYear);
+            }
+            
             // Process time ranges like "2:00 PM - 3:00 PM" or single times like "2:00 PM"
             const timeParts = timeRange.split(' - ');
             const startTimeStr = timeParts[0].trim();
             const endTimeStr = timeParts.length > 1 ? timeParts[1].trim() : '';
             
-            console.log('Start time string:', startTimeStr);
-            console.log('End time string:', endTimeStr);
             
             // Try multiple time regex patterns
             const timePatterns = [
@@ -299,7 +321,6 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
               for (const pattern of timePatterns) {
                 const startMatch = startTimeStr.match(pattern);
                 if (startMatch) {
-                  console.log('Start time match with pattern:', pattern, startMatch);
                   
                   const { hours, minutes, ampm } = parseTimeString(startTimeStr, pattern, startMatch);
                   console.log('Parsed start time:', { hours, minutes, ampm });
@@ -360,7 +381,7 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
             if (!endTimeParsed && startTimeParsed) {
               // If no end time is provided, set meeting duration to 1 hour
               endDate = new Date(startDate);
-              endDate.setHours(endDate.getHours() + 1);
+              endDate.setHours(endDate.getHours() + DEFAULT_MEETING_DURATION);
               console.log('End date set to start + 1hr:', endDate);
               endTimeParsed = true;  // We've set a valid end time
             }
@@ -416,6 +437,17 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
       // Success - we have valid parsed dates!
       console.log('Final parsed start date:', startDate);
       console.log('Final parsed end date:', endDate);
+      
+      // Final year check before formatting
+      const currentYear = new Date().getFullYear();
+      if (startDate.getFullYear() < currentYear - 10 || startDate.getFullYear() > currentYear + 10) {
+        console.log('Final check: Fixing start date year from', startDate.getFullYear(), 'to', currentYear);
+        startDate.setFullYear(currentYear);
+      }
+      if (endDate.getFullYear() < currentYear - 10 || endDate.getFullYear() > currentYear + 10) {
+        console.log('Final check: Fixing end date year from', endDate.getFullYear(), 'to', currentYear);
+        endDate.setFullYear(currentYear);
+      }
       
       startDateFormatted = formatDateForGCal(startDate);
       endDateFormatted = formatDateForGCal(endDate);
@@ -762,7 +794,7 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
         </div>
         {/* Join button with tooltip */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <button
+          {!isUpcoming ? <button
             onClick={handleJoinClick}
             style={{
               backgroundColor: colors.accent,
@@ -800,10 +832,10 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
             onBlur={() => setShowTooltip(false)}
           >
             <span style={{ display: 'flex', alignItems: 'center' }}>
-              <CalendarIcon />
+              {isUpcoming ? <CheckIcon /> : <CalendarIcon />}
               <span>Join!</span>
             </span>
-          </button>
+          </button> : <div></div>}
           
           {/* Tooltip */}
           {showTooltip && (
@@ -824,7 +856,7 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
               zIndex: 10,
               pointerEvents: 'none'
             }}>
-              Add to Google Calendar
+              {isUpcoming ? 'Open in Google Calendar' : 'Add to Google Calendar'}
               <div style={{
                 position: 'absolute',
                 top: '100%',
