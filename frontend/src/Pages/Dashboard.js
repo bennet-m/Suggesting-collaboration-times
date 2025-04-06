@@ -64,7 +64,7 @@ export default function Dashboard() {
             time: "7 - 9 PM",
             dueDate: "April 17",
             assignment: "HW 6",
-            attendees: "John Doe, Jane Smith"
+            attendees: "Bob, Alice, Charlie"
           }}
           colorScheme={colorSchemes.study}
           onAdd={() => console.log("Added Partner Work Sesh")}
@@ -80,7 +80,7 @@ export default function Dashboard() {
             time: "1 - 2 PM",
             dueDate: "April 16",
             assignment: "Project 3",
-            attendees: "John Doe, Jane Smith"
+            attendees: "Farah, John, Jane"
           }}
           colorScheme={colorSchemes.project}
           onAdd={() => console.log("Added Project Sync")}
@@ -96,7 +96,7 @@ export default function Dashboard() {
             time: "5 - 6 PM",
             dueDate: "April 18",
             assignment: "Reading 4",
-            attendees: "John Doe, Jane Smith"
+            attendees: "Jenny, Sabrina, Eli, Dana"
           }}
           colorScheme={colorSchemes.event}
           onAdd={() => console.log("Added Reading Group")}
@@ -112,7 +112,7 @@ export default function Dashboard() {
             time: "3 - 5 PM",
             dueDate: "April 19",
             assignment: "Final Exam",
-            attendees: "The Whole Class"
+            attendees: "Jim, Bob, Alice, Charlie"
           }}
           colorScheme={colorSchemes.deadline}
           onAdd={() => console.log("Added Final Review")}
@@ -128,7 +128,7 @@ export default function Dashboard() {
             time: "10 - 11 AM",
             dueDate: "No deadline",
             assignment: "Social",
-            attendees: "Study Group"
+            attendees: "Dana, Eli, Sabrina, Jenny"
           }}
           colorScheme={colorSchemes.casual}
           onAdd={() => console.log("Added Study Break Coffee")}

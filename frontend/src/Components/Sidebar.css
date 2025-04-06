@@ -120,6 +120,7 @@
   text-align: left;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+  
 }
 
 .section-panel h4 {
@@ -144,7 +145,7 @@
   text-align: left;
   margin-bottom: 5px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .section-panel li i {
@@ -277,7 +278,7 @@
 }
 
 .action-button {
-  width: 100%;
+  width: 150px;
   padding: 8px;
   background-color: #e9ecef;
   color: #333;
@@ -286,11 +287,12 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .action-button i {
-  margin-right: 8px;
+  margin: 0;
+  padding-right: 8px;
   color: #3a86ff;
 }
 
@@ -315,6 +317,8 @@
   margin-bottom: 8px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .assignment-title, .assignment-due {
@@ -360,4 +364,172 @@
   .toggle-icons {
     top: 70px;
   }
+}
+
+/* Classmates section styles */
+.section-title {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 14px;
+  text-align: left;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.classmates-list ul {
+  margin-top: 10px;
+}
+
+.classmate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px !important;
+}
+
+.classmate-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.classmate-info i {
+  color: #4a8fe7 !important;
+}
+
+.class-label {
+  margin-left: 5px;
+  background-color: #e9f2ff;
+  color: #3a86ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.add-classmate-button {
+  background-color: transparent;
+  border: 1px solid #3a86ff;
+  color: #3a86ff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-classmate-button:hover {
+  background-color: #3a86ff;
+  color: white;
+}
+
+/* Add Friend Popup styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.add-friend-popup {
+  background-color: white;
+  border-radius: 8px;
+  width: 360px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.popup-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #666;
+}
+
+.popup-content {
+  padding: 20px;
+}
+
+.popup-content label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.popup-content input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.popup-content input:focus {
+  border-color: #3a86ff;
+  outline: none;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.popup-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  margin-right: 10px;
+}
+
+.cancel-button:hover {
+  background-color: #e8e8e8;
+}
+
+.add-button {
+  background-color: #3a86ff;
+  color: white;
+  border: none;
+}
+
+.add-button:hover {
+  background-color: #2970e4;
 } 
