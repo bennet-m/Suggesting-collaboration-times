@@ -2,6 +2,7 @@ import React from 'react';
 import { FaBook, FaCalendarAlt, FaClock, FaUsers, FaArrowRight } from 'react-icons/fa';
 
 export default function About() {
+
     return (
         <div className="about-container" style={{ 
             padding: '4rem 2rem', 
@@ -75,6 +76,39 @@ export default function About() {
                         Our mission is to streamline the process of finding time to work on group assignments. By connecting to your Google Calendar, we automatically identify when you and your classmates are all available, making it easier than ever to schedule productive study sessions.
                     </p>
                 </section>
+        <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+            <h1 style={{ fontSize: '2.5rem', color: '#4285F4', marginBottom: '1rem' }}>Our Mission</h1>
+            
+            <div style={{ marginTop: '2rem', lineHeight: '1.6' }}>
+                <p style={{ marginBottom: '1.5rem' }}>
+                    Here at StudySync, we empower students by making collaboration easier than ever.
+                    Our algorithm analyzes user calendar data and suggests shared work times. This makes it 
+                    easier than ever to study together, plan group projects, and build meaningful academic connections.
+                </p>
+                
+            <h2 style={{ fontSize: '1.8rem', marginTop: '2rem', color: '#4285F4' }}>Meet the Team</h2>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
+                {[
+                    { name: 'Marilyn Ma (CMC ’27)', src: '/images/placeholder.jpg' },
+                    { name: 'Bennet Matazzoni (HMC ’26)', src: '/images/placeholder.jpg' },
+                    { name: 'AJ Matheson-Lieber (CMC ’27)', src: '/images/placeholder.jpg' },
+                    { name: 'Nico Riley (CMC ’27)', src: '/images/placeholder.jpg' }
+                ].map((member, i) => (
+                    <div key={i} style={{ textAlign: 'center', maxWidth: '150px' }}>
+                        <img 
+                            src={member.src} 
+                            alt={member.name} 
+                            style={{ 
+                                width: '100%', 
+                                height: 'auto', 
+                                borderRadius: '8px', 
+                                marginBottom: '0.5rem' 
+                            }} 
+                        />
+                        <p style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{member.name}</p>
+                    </div>
+                ))}
+            </div>
                 
                 <section style={{
                     marginBottom: '3rem',

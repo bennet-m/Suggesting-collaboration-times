@@ -1,10 +1,23 @@
 from flask import Flask, redirect, request, session, jsonify
-from oauth import get_flow, get_credentials, get_user_data
+from oauth import get_flow, get_credentials, get_user_data, fetch_calendar_events
 from models import User
 from flask_cors import CORS
 
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+from slugify import slugify
+
 app = Flask(__name__)
 app.secret_key = "dev-key"
+
+cred = credentials.Certificate("/Users/marilynma/Desktop/CS/Projects/Suggesting-collaboration-times/firebase-key.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+print("✅ Firebase initialized and Firestore client ready!")
+
+app = Flask(__name__)
+app.secret_key = "dev-key"  
 
 # Update to allow both localhost and 127.0.0.1
 FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
@@ -36,16 +49,23 @@ def oauth2callback():
         "client_secret": creds.client_secret,
         "scopes": creds.scopes
     }
-
+    get_suggestions()
     return redirect(FRONTEND_URL[0])
 
-@app.route("/calendar")
-def calendar():
-    import json
-    creds = get_credentials()
+def get_user(creds):
     user = get_user_data(creds)
-    return json.dumps(user.to_dict())
+    db.set_user(user)
+    return user
+
+def get_suggestions(user: User):
+    
+    
+@app.route("/get_suggestions")
+def get_suggestions():
+    creds = get_credentials()
+    user = get_user(creds)
+    suggestions = get_suggestions(user)
+    
 
 if __name__ == "__main__":
-    # Make sure to run on 127.0.0.1 not localhost to match frontend request
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(debug=True)
