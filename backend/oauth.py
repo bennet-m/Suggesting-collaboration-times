@@ -50,6 +50,15 @@ def get_credentials():
 
     return creds
 
+def parse_datetime(datetime_str):
+    """Parse ISO 8601 datetime strings, handling 'Z' timezone indicator."""
+    # Replace 'Z' with '+00:00' for UTC timezone
+    if datetime_str.endswith('Z'):
+        datetime_str = datetime_str[:-1] + '+00:00'
+    
+    # Now parse with fromisoformat which can handle +00:00 format
+    return datetime.fromisoformat(datetime_str)
+
 def get_user_data(creds):
     service = build("calendar", "v3", credentials=creds)
     now = datetime.now(timezone.utc)
@@ -76,21 +85,25 @@ def get_user_data(creds):
     busy_times = []
     assignments = []
     for e in events:
-        if any(e["summary"] == assignment["title"] and datetime.fromisoformat(e["end"]["dateTime"]) == assignment["due"] for assignment in assignments):
+        if any(e["summary"] == assignment["title"] and parse_datetime(e["end"]["dateTime"]) == assignment["due"] for assignment in assignments):
             continue
         if "start" not in e or "dateTime" not in e["start"]:
             continue
-        start = datetime.fromisoformat(e["start"]["dateTime"])
-        end = datetime.fromisoformat(e["end"]["dateTime"])
-        busy_times.append(TimeBlock(start=start, end=end))
-        
-        if any(k.lower() in e["summary"].lower() for k in KEYWORDS):
-            assignment: Assignment = {
-                "title": e["summary"],
-                "due": end,
-                "description": e.get("description")
-            }
-            assignments.append(assignment)
+        try:
+            start = parse_datetime(e["start"]["dateTime"])
+            end = parse_datetime(e["end"]["dateTime"])
+            busy_times.append(TimeBlock(start=start, end=end))
+            
+            if any(k.lower() in e["summary"].lower() for k in KEYWORDS):
+                assignment: Assignment = {
+                    "title": e["summary"],
+                    "due": end,
+                    "description": e.get("description")
+                }
+                assignments.append(assignment)
+        except ValueError as err:
+            print(f"Error parsing datetime: {str(err)}")
+            continue
 
     busy_times = merge_intervals(sorted(busy_times, key=lambda x: x["start"]))
     free_blocks = get_free_blocks(busy_times, time_min, time_max)

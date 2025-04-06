@@ -1,0 +1,30 @@
+{
+  "name": "collaboration-times-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Suggesting Collaboration Times application",
+  "main": "app.py",
+  "scripts": {
+    "start": "python app.py",
+    "dev": "flask run --debug",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "python-slugify": "^8.0.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "python": {
+    "dependencies": [
+      "flask",
+      "flask-cors",
+      "google-auth-oauthlib",
+      "google-auth",
+      "google-api-python-client",
+      "python-slugify"
+    ]
+  },
+  "author": "",
+  "license": "MIT"
+} 

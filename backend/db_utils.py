@@ -14,6 +14,15 @@ app.secret_key = "dev-key"
 # Initialize local JSON storage
 DATA_FILE = "data.json"
 
+def parse_datetime(datetime_str):
+    """Parse ISO 8601 datetime strings, handling 'Z' timezone indicator."""
+    # Replace 'Z' with '+00:00' for UTC timezone
+    if datetime_str.endswith('Z'):
+        datetime_str = datetime_str[:-1] + '+00:00'
+    
+    # Now parse with fromisoformat which can handle +00:00 format
+    return datetime.fromisoformat(datetime_str)
+
 def load_data() -> Dict[str, Any]:
     if not os.path.exists(DATA_FILE):
         # Create file with initial structure if it doesn't exist
@@ -46,21 +55,38 @@ FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
 CORS(app, supports_credentials=True, origins=FRONTEND_URL)
 
 def create_user(name: str, email: str) -> None:
-    print(f"📝 Saving {name} ({email}) to local storage")
-    data = load_data()
-    
-    # Check if user already exists
-    if email in data["users"]:
-        print(f"⚠️ User {email} already exists in the database")
+    """Create a new user or update an existing one."""
+    if not email or not name:
+        print("⚠️ Both name and email are required")
         return
         
-    data["users"][email] = {
-        "name": name,
-        "email": email,
-        "assignments": [],
-        "free_time": []
-    }
-    save_data(data)
+    print(f"📝 Saving {name} ({email}) to local storage")
+    try:
+        data = load_data()
+        
+        # Check if user already exists and update name if needed
+        if email in data["users"]:
+            # Update name if changed
+            if data["users"][email]["name"] != name:
+                data["users"][email]["name"] = name
+                print(f"✅ Updated name for user {email}")
+            else:
+                print(f"⚠️ User {email} already exists in the database")
+            save_data(data)
+            return
+            
+        # Create new user
+        data["users"][email] = {
+            "name": name,
+            "email": email,
+            "assignments": [],
+            "free_time": []
+        }
+        save_data(data)
+        print(f"✅ Created new user {name} ({email})")
+    except Exception as e:
+        print(f"❌ Error creating/updating user: {str(e)}")
+        raise
 
 def add_assignment_to_user(email: str, title: str, due: datetime) -> None:
     due_str = due.isoformat() if isinstance(due, datetime) else due
@@ -143,15 +169,15 @@ def get_overlaps_between_users(email1: str, email2: str) -> List[Dict[str, Any]]
     
     for block1 in user1_times:
         try:
-            start1 = datetime.fromisoformat(block1["start"])
-            end1 = datetime.fromisoformat(block1["end"])
+            start1 = parse_datetime(block1["start"])
+            end1 = parse_datetime(block1["end"])
         except Exception:
             continue
             
         for block2 in user2_times:
             try:
-                start2 = datetime.fromisoformat(block2["start"])
-                end2 = datetime.fromisoformat(block2["end"])
+                start2 = parse_datetime(block2["start"])
+                end2 = parse_datetime(block2["end"])
             except Exception:
                 continue
                 
@@ -173,39 +199,79 @@ def get_overlapping_users_for_assignment(email: str, title: str, due: str) -> Li
     return [s for s in students if s != email]
 
 def send_user(user: User) -> None:
-    data = load_data()
-    if user.email not in data["users"]:
-        create_user(user.name, user.email)
+    """Send user data to storage, handling both User objects and dictionaries."""
+    try:
+        # Handle if user is a dictionary
+        if isinstance(user, dict):
+            email = user.get("email")
+            name = user.get("name")
+            assignments = user.get("assignments", [])
+            free_time = user.get("free_time", [])
+        else:
+            # Handle if user is a User object
+            email = user.email
+            name = user.name
+            assignments = user.assignments
+            free_time = user.free_time
+            
+        if not email or not name:
+            print("⚠️ Cannot send user: Missing email or name")
+            return
+            
+        # Create or update the user
+        create_user(name, email)
         data = load_data()  # Reload after creating user
         
-    for assignment in user.assignments:
-        title = assignment["title"]
-        due = assignment["due"]
-        
-        if not title or not due:
-            continue
-            
-        if isinstance(due, str):
-            due = datetime.fromisoformat(due)
-            
-        add_assignment_to_user(user.email, title, due)
-        
-    for time_block in user.free_time:
-        start = time_block["start"]
-        end = time_block["end"]
-        
-        if not start or not end:
-            continue
-            
-        if isinstance(start, str):
-            start = datetime.fromisoformat(start)
-        if isinstance(end, str):
-            end = datetime.fromisoformat(end)
-            
-        add_free_time_to_user(user.email, start, end)
+        # Process assignments
+        for assignment in assignments:
+            if isinstance(assignment, dict):
+                title = assignment.get("title")
+                due = assignment.get("due")
+                
+                if not title or not due:
+                    continue
+                    
+                if isinstance(due, str):
+                    try:
+                        due = parse_datetime(due)
+                    except ValueError:
+                        print(f"⚠️ Invalid date format for due date: {due}")
+                        continue
+                    
+                add_assignment_to_user(email, title, due)
+                
+        # Process free time blocks
+        for time_block in free_time:
+            if isinstance(time_block, dict):
+                start = time_block.get("start")
+                end = time_block.get("end")
+                
+                if not start or not end:
+                    continue
+                    
+                if isinstance(start, str):
+                    try:
+                        start = parse_datetime(start)
+                    except ValueError:
+                        print(f"⚠️ Invalid date format for start time: {start}")
+                        continue
+                        
+                if isinstance(end, str):
+                    try:
+                        end = parse_datetime(end)
+                    except ValueError:
+                        print(f"⚠️ Invalid date format for end time: {end}")
+                        continue
+                        
+                add_free_time_to_user(email, start, end)
+                
+        print(f"✅ Successfully processed user data for {name} ({email})")
+    except Exception as e:
+        print(f"❌ Error in send_user: {str(e)}")
+        raise
 
 def fetch_user_free_times_before_due(emails: List[str], due: datetime) -> List[TimeBlock]:
-    due_datetime = due if isinstance(due, datetime) else datetime.fromisoformat(str(due))
+    due_datetime = due if isinstance(due, datetime) else parse_datetime(str(due))
     free_times = []
     data = load_data()
     
@@ -215,8 +281,8 @@ def fetch_user_free_times_before_due(emails: List[str], due: datetime) -> List[T
         blocks = data["users"][email]["free_time"]
         for block in blocks:
             try:
-                start = datetime.fromisoformat(block["start"])
-                end = datetime.fromisoformat(block["end"])
+                start = parse_datetime(block["start"])
+                end = parse_datetime(block["end"])
             except Exception:
                 continue
                 
@@ -269,7 +335,7 @@ def get_suggestions(user: User) -> List[Dict[str, Any]]:
         title = assignment["title"]
         due = assignment["due"]
         if isinstance(due, str):
-            due = datetime.fromisoformat(due)
+            due = parse_datetime(due)
 
         overlapping_users = get_overlapping_users_for_assignment(user.email, title, due.isoformat())
         print("Overlapping users:", overlapping_users, title)

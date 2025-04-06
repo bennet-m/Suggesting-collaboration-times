@@ -13,7 +13,13 @@ app.secret_key = "dev-key"
 
 # Update to allow both localhost and 127.0.0.1
 FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
-CORS(app, supports_credentials=True, origins=FRONTEND_URL)
+CORS(app, 
+     supports_credentials=True, 
+     origins=FRONTEND_URL,
+     allow_headers=["Content-Type", "Authorization"],
+     expose_headers=["Content-Type", "Authorization"],
+     max_age=1800  # 30 minutes in seconds
+)
 
 @app.route("/")
 def index():
@@ -40,14 +46,49 @@ def oauth2callback():
         "client_secret": creds.client_secret,
         "scopes": creds.scopes
     }
-    return main_logic()
     
-def main_logic():
+    # Process the user data
+    user = process_authentication()
+    
+    # Prepare additional information about what was found
+    has_assignments = len(user.assignments) > 0
+    has_free_time = len(user.free_time) > 0
+    
+    # Redirect back to frontend with user info
+    frontend_url = FRONTEND_URL[0]  # Use the first URL in the list
+    redirect_url = (
+        f"{frontend_url}?auth=success"
+        f"&name={user.name}"
+        f"&email={user.email}"
+        f"&has_assignments={str(has_assignments).lower()}"
+        f"&has_free_time={str(has_free_time).lower()}"
+    )
+    return redirect(redirect_url)
+    
+def process_authentication():
+    """Process authentication and return user data"""
     creds = get_credentials()
     user = get_user_data(creds)
     send_user(user)
-    suggestions = get_suggestions(user)
-    return jsonify(suggestions)
+    return user
+
+@app.route("/api/current-user")
+def get_current_user():
+    """Get current authenticated user's data"""
+    if "credentials" not in session:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    try:
+        creds = get_credentials()
+        user = get_user_data(creds)
+        suggestions = get_suggestions(user)
+        return jsonify({
+            "user": user.to_dict(),
+            "suggestions": suggestions
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting current user: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/suggestions", methods=["POST"])
 def get_suggestions_endpoint():
@@ -55,15 +96,26 @@ def get_suggestions_endpoint():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    user = {
-        "name": data.get("name"),
-        "email": data.get("email"),
-        "assignments": data.get("assignments", []),
-        "free_time": data.get("free_time", [])
-    }
+    try:
+        user = {
+            "name": data.get("name", ""),
+            "email": data.get("email", ""),
+            "assignments": data.get("assignments", []),
+            "free_time": data.get("free_time", [])
+        }
 
-    suggestions = get_suggestions(user)
-    return jsonify({"suggestions": suggestions})
+        # Create or update the user in the system
+        send_user(user)
+        
+        # Handle the case where user has no assignments or free time
+        if not user["assignments"] or not user["free_time"]:
+            return jsonify({"suggestions": []}), 200
+            
+        suggestions = get_suggestions(user)
+        return jsonify({"suggestions": suggestions})
+    except Exception as e:
+        app.logger.error(f"Error generating suggestions: {str(e)}")
+        return jsonify({"error": str(e), "suggestions": []}), 500
 
 @app.route("/api/user", methods=["POST"])
 def create_user_endpoint():
@@ -77,8 +129,12 @@ def create_user_endpoint():
     if not name or not email:
         return jsonify({"error": "Name and email are required"}), 400
 
-    create_user(name, email)
-    return f"✅ User {name} saved to local storage!"
+    try:
+        create_user(name, email)
+        return jsonify({"success": True, "message": f"User {name} saved successfully"}), 200
+    except Exception as e:
+        app.logger.error(f"Error creating user: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/user/<email>", methods=["GET"])
 def get_user_endpoint(email):
@@ -181,6 +237,12 @@ def test_suggestions():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/logout")
+def logout():
+    """Clear the user session and log them out"""
+    session.clear()
+    return jsonify({"success": True, "message": "Successfully logged out"})
 
 if __name__ == "__main__":
     app.run(debug=True)

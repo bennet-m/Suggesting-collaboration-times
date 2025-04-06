@@ -2,6 +2,15 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any, TypedDict
 from dataclasses import dataclass, field
 
+def parse_datetime(datetime_str):
+    """Parse ISO 8601 datetime strings, handling 'Z' timezone indicator."""
+    # Replace 'Z' with '+00:00' for UTC timezone
+    if datetime_str.endswith('Z'):
+        datetime_str = datetime_str[:-1] + '+00:00'
+    
+    # Now parse with fromisoformat which can handle +00:00 format
+    return datetime.fromisoformat(datetime_str)
+
 class TimeBlock(TypedDict):
     start: datetime
     end: datetime
@@ -75,7 +84,7 @@ class User:
         assignments: List[Assignment] = [
             Assignment(
                 title=a["title"],
-                due=datetime.fromisoformat(a["due"]),
+                due=parse_datetime(a["due"]),
                 description=a.get("description")
             )
             for a in data.get("assignments", [])
@@ -83,8 +92,8 @@ class User:
         
         free_time: List[TimeBlock] = [
             TimeBlock(
-                start=datetime.fromisoformat(block["start"]),
-                end=datetime.fromisoformat(block["end"])
+                start=parse_datetime(block["start"]),
+                end=parse_datetime(block["end"])
             )
             for block in data.get("free_time", [])
         ]

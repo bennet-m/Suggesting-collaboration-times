@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
 
 const Login = ({ setAuthenticated }) => {
@@ -9,6 +9,46 @@ const Login = ({ setAuthenticated }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Check for auth parameters on component mount
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const authSuccess = queryParams.get('auth');
+        
+        if (authSuccess === 'success') {
+            const userName = queryParams.get('name');
+            const userEmail = queryParams.get('email');
+            const hasAssignments = queryParams.get('has_assignments') === 'true';
+            const hasFreeTime = queryParams.get('has_free_time') === 'true';
+            
+            if (userName && userEmail) {
+                // Store user info in localStorage
+                localStorage.setItem('userEmail', userEmail);
+                localStorage.setItem('userName', userName);
+                
+                // Set as authenticated
+                setAuthenticated(true);
+                
+                // Show a success message based on what was found
+                let message = '';
+                if (hasAssignments && hasFreeTime) {
+                    message = 'Found assignments and free time in your calendar!';
+                } else if (hasAssignments) {
+                    message = 'Found assignments in your calendar, but no free time blocks.';
+                } else if (hasFreeTime) {
+                    message = 'Found free time in your calendar, but no assignments.';
+                } else {
+                    message = 'Connected to Google Calendar successfully!';
+                }
+                
+                alert(message);
+                
+                // Navigate to dashboard
+                navigate('/', { replace: true });
+            }
+        }
+    }, [location, navigate, setAuthenticated]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,11 +94,9 @@ const Login = ({ setAuthenticated }) => {
     };
 
     const handleGoogleCalendarConnect = () => {
-        // In a real app, this would redirect to Google OAuth
-        // For now, we'll just navigate to the dashboard
-        console.log('Connecting to Google Calendar for user:', name, email);
-        // After successful Google auth, we would redirect back and get user info
-        navigate('/');
+        // Redirect to backend login endpoint for Google OAuth flow
+        const BACKEND_URL = 'http://127.0.0.1:5000';
+        window.location.href = `${BACKEND_URL}/login`;
     };
 
     const toggleAuthMode = () => {
