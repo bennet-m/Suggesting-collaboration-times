@@ -1,5 +1,32 @@
 .App {
   text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  margin-left: 250px; /* Same as sidebar width */
+  transition: margin-left 0.3s ease;
+}
+
+.content.sidebar-collapsed {
+  margin-left: 0;
+}
+
+/* Navbar styling */
+nav {
+  z-index: 101; /* Above sidebar */
 }
 
 .App-logo {
@@ -34,5 +61,13 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Media query for mobile responsiveness */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    width: 100%;
   }
 }

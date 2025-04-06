@@ -1,29 +1,47 @@
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import './Navbar.css';
 
 function Navbar() {
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Get current scroll position
+      const currentScrollPos = window.pageYOffset;
+      
+      // Set navbar visibility based on scroll direction
+      setVisible(
+        // Make the navbar visible if user scrolls up or is at the top of the page
+        // Hide it if user scrolls down and is not at the top
+        prevScrollPos > currentScrollPos || currentScrollPos < 10
+      );
+      
+      // Update previous scroll position
+      setPrevScrollPos(currentScrollPos);
+    };
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+
+    // Clean up event listener
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [prevScrollPos]);
+
   return (
-    <nav style={{ 
-      backgroundColor: '#4285F4', 
-      padding: '1rem', 
-      display: 'flex',
-      justifyContent: 'space-between'
-    }}>
+    <nav className={`navbar ${visible ? '' : 'hidden'}`}>
       <div className="logo">
-        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.2rem' }}>
+        <Link to="/">
           StudySync
         </Link>
       </div>
-      <ul style={{ 
-        display: 'flex', 
-        listStyle: 'none', 
-        margin: 0,
-        gap: '2rem'
-      }}>
+      <ul className="nav-links">
         <li>
-          <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Dashboard</Link>
+          <Link to="/">Dashboard</Link>
         </li>
         <li>
-          <Link to="/about" style={{ color: 'white', textDecoration: 'none' }}>About</Link>
+          <Link to="/about">About</Link>
         </li>
       </ul>
     </nav>
