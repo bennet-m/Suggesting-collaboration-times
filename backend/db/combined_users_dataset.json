@@ -1,0 +1,336 @@
+{
+  "users": [
+    {
+      "name": "Alice",
+      "email": "alice@example.com",
+      "assignments": [
+        {
+          "title": "CS225 Assignment 2",
+          "due": "2025-04-07T23:59"
+        },
+        {
+          "title": "MATH241 Quiz",
+          "due": "2025-04-09T12:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-06T14:00",
+          "end": "2025-04-06T15:00"
+        },
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:00"
+        },
+        {
+          "start": "2025-04-08T10:00",
+          "end": "2025-04-08T11:00"
+        }
+      ]
+    },
+    {
+      "name": "Bob",
+      "email": "bob@example.com",
+      "assignments": [
+        {
+          "title": "CS225 Assignment 2",
+          "due": "2025-04-07T23:59"
+        },
+        {
+          "title": "PHYS211 Lab",
+          "due": "2025-04-10T15:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-06T14:00",
+          "end": "2025-04-06T15:00"
+        },
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:30"
+        },
+        {
+          "start": "2025-04-08T11:00",
+          "end": "2025-04-08T12:00"
+        }
+      ]
+    },
+    {
+      "name": "Charlie",
+      "email": "charlie@example.com",
+      "assignments": [
+        {
+          "title": "MATH241 Quiz",
+          "due": "2025-04-09T12:00"
+        },
+        {
+          "title": "PHYS211 Lab",
+          "due": "2025-04-10T15:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-08T10:00",
+          "end": "2025-04-08T11:00"
+        },
+        {
+          "start": "2025-04-08T11:00",
+          "end": "2025-04-08T12:00"
+        },
+        {
+          "start": "2025-04-09T14:00",
+          "end": "2025-04-09T15:00"
+        }
+      ]
+    },
+    {
+      "name": "Dana",
+      "email": "dana@example.com",
+      "assignments": [
+        {
+          "title": "CS225 Assignment 2",
+          "due": "2025-04-08T01:00"
+        },
+        {
+          "title": "MATH241 Quiz",
+          "due": "2025-04-09T12:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:00"
+        },
+        {
+          "start": "2025-04-08T10:00",
+          "end": "2025-04-08T11:00"
+        },
+        {
+          "start": "2025-04-09T10:00",
+          "end": "2025-04-09T11:00"
+        }
+      ]
+    },
+    {
+      "name": "Eli",
+      "email": "eli@example.com",
+      "assignments": [
+        {
+          "title": "PHYS211 Lab",
+          "due": "2025-04-10T15:00"
+        },
+        {
+          "title": "STAT400 Homework",
+          "due": "2025-04-11T23:59"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-08T11:00",
+          "end": "2025-04-08T12:00"
+        },
+        {
+          "start": "2025-04-09T13:00",
+          "end": "2025-04-09T14:00"
+        },
+        {
+          "start": "2025-04-10T14:00",
+          "end": "2025-04-10T15:00"
+        }
+      ]
+    },
+    {
+      "name": "Farah",
+      "email": "farah@example.com",
+      "assignments": [
+        {
+          "title": "STAT400 Homework",
+          "due": "2025-04-11T23:59"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-09T13:00",
+          "end": "2025-04-09T14:00"
+        },
+        {
+          "start": "2025-04-10T14:00",
+          "end": "2025-04-10T15:00"
+        },
+        {
+          "start": "2025-04-11T16:00",
+          "end": "2025-04-11T17:00"
+        }
+      ]
+    },
+    {
+      "name": "Grace",
+      "email": "grace@example.com",
+      "assignments": [
+        {
+          "title": "CS225 Assignment 2",
+          "due": "2025-04-07T23:59"
+        },
+        {
+          "title": "STAT400 Homework",
+          "due": "2025-04-11T23:59"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:00"
+        },
+        {
+          "start": "2025-04-10T14:00",
+          "end": "2025-04-10T15:00"
+        },
+        {
+          "start": "2025-04-11T16:00",
+          "end": "2025-04-11T17:00"
+        }
+      ]
+    },
+    {
+      "name": "Henry",
+      "email": "henry@example.com",
+      "assignments": [
+        {
+          "title": "PHYS211 Lab",
+          "due": "2025-04-10T15:00"
+        },
+        {
+          "title": "STAT400 Homework",
+          "due": "2025-04-11T23:59"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-08T11:00",
+          "end": "2025-04-08T12:00"
+        },
+        {
+          "start": "2025-04-06T14:00",
+          "end": "2025-04-06T15:00"
+        },
+        {
+          "start": "2025-04-09T13:00",
+          "end": "2025-04-09T14:00"
+        }
+      ]
+    },
+    {
+      "name": "Isla",
+      "email": "isla@example.com",
+      "assignments": [
+        {
+          "title": "BIO150 Midterm",
+          "due": "2025-04-10T10:00"
+        },
+        {
+          "title": "CS225 Assignment 2",
+          "due": "2025-04-07T23:59"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-11T16:00",
+          "end": "2025-04-11T17:00"
+        },
+        {
+          "start": "2025-04-06T14:00",
+          "end": "2025-04-06T15:00"
+        },
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:00"
+        }
+      ]
+    },
+    {
+      "name": "Jack",
+      "email": "jack@example.com",
+      "assignments": [
+        {
+          "title": "PHYS211 Lab",
+          "due": "2025-04-10T15:00"
+        },
+        {
+          "title": "ECON101 Essay",
+          "due": "2025-04-08T18:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-09T13:00",
+          "end": "2025-04-09T14:00"
+        },
+        {
+          "start": "2025-04-08T11:00",
+          "end": "2025-04-08T12:00"
+        },
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:00"
+        }
+      ]
+    },
+    {
+      "name": "Kira",
+      "email": "kira@example.com",
+      "assignments": [
+        {
+          "title": "BIO150 Midterm",
+          "due": "2025-04-10T10:00"
+        },
+        {
+          "title": "PHYS211 Lab",
+          "due": "2025-04-10T15:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-08T10:00",
+          "end": "2025-04-08T11:00"
+        },
+        {
+          "start": "2025-04-11T16:00",
+          "end": "2025-04-11T17:00"
+        },
+        {
+          "start": "2025-04-09T13:00",
+          "end": "2025-04-09T14:00"
+        }
+      ]
+    },
+    {
+      "name": "Liam",
+      "email": "liam@example.com",
+      "assignments": [
+        {
+          "title": "CS225 Assignment 2",
+          "due": "2025-04-07T23:59"
+        },
+        {
+          "title": "BIO150 Midterm",
+          "due": "2025-04-10T10:00"
+        }
+      ],
+      "free_time": [
+        {
+          "start": "2025-04-10T14:00",
+          "end": "2025-04-10T15:00"
+        },
+        {
+          "start": "2025-04-09T13:00",
+          "end": "2025-04-09T14:00"
+        },
+        {
+          "start": "2025-04-07T16:00",
+          "end": "2025-04-07T17:00"
+        }
+      ]
+    }
+  ]
+}
