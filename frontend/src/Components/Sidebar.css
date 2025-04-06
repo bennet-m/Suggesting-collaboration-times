@@ -256,8 +256,9 @@
 }
 
 .friends-search input {
-  width: 100%;
+  width: 90%;
   padding: 8px 10px;
+  margin-right: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 14px;
@@ -343,8 +344,45 @@
 }
 
 .time-slot-item {
+  background-color: #f0f8ff;
+  border-left: 3px solid #3a86ff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
   display: flex;
   align-items: center;
+}
+
+.time-slot-item:hover {
+  background-color: #e0efff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.time-slot-item i {
+  color: #3a86ff;
+  margin-right: 8px;
+  transition: transform 0.2s ease;
+}
+
+.time-slot-item:hover i {
+  transform: scale(1.1);
+}
+
+.time-slot-item::after {
+  content: 'Schedule';
+  position: absolute;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0;
+  background-color: rgba(58, 134, 255, 0.1);
+  padding: 3px 6px;
+  border-radius: 3px;
+  transition: opacity 0.2s ease;
+}
+
+.time-slot-item:hover::after {
+  opacity: 1;
 }
 
 /* For small screens */
@@ -449,6 +487,7 @@
   overflow: hidden;
 }
 
+
 .popup-header {
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
@@ -532,4 +571,10 @@
 
 .add-button:hover {
   background-color: #2970e4;
+}
+
+/* Modal animation keyframes */
+@keyframes fadeScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 } 

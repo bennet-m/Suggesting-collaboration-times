@@ -4,6 +4,7 @@ import './Login.css';
 
 const Login = ({ setAuthenticated }) => {
     const [isLogin, setIsLogin] = useState(true);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,8 +14,14 @@ const Login = ({ setAuthenticated }) => {
         e.preventDefault();
         setError('');
 
+        // Validate fields
         if (!email) {
             setError('Email is required');
+            return;
+        }
+
+        if (!name) {
+            setError('Full name is required');
             return;
         }
 
@@ -30,8 +37,9 @@ const Login = ({ setAuthenticated }) => {
         try {
             // Simulate API call
             setTimeout(() => {
-                // Store email in localStorage for persistence
+                // Store user info in localStorage for persistence
                 localStorage.setItem('userEmail', email);
+                localStorage.setItem('userName', name);
                 
                 // Set user as authenticated
                 setAuthenticated(true);
@@ -48,7 +56,7 @@ const Login = ({ setAuthenticated }) => {
     const handleGoogleCalendarConnect = () => {
         // In a real app, this would redirect to Google OAuth
         // For now, we'll just navigate to the dashboard
-        console.log('Connecting to Google Calendar with email:', email);
+        console.log('Connecting to Google Calendar for user:', name, email);
         // After successful Google auth, we would redirect back and get user info
         navigate('/');
     };
@@ -63,6 +71,16 @@ const Login = ({ setAuthenticated }) => {
             <div className="login-card">
                 <h2>{isLogin ? 'Sign In' : 'Sign Up'}</h2>
                 <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="name">Full Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Enter your full name"
+                        />
+                    </div>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input

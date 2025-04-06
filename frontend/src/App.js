@@ -17,8 +17,19 @@ function App() {
   useEffect(() => {
     // In a real app, we would check for a valid auth token/session here
     const userEmail = localStorage.getItem('userEmail');
-    if (userEmail) {
+    const userName = localStorage.getItem('userName');
+    
+    if (userEmail && userName) {
       setIsAuthenticated(true);
+    } else {
+      // If we have an email but no name, clear all data to ensure consistent state
+      if (userEmail) {
+        localStorage.removeItem('userEmail');
+      }
+      if (userName) {
+        localStorage.removeItem('userName');
+      }
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -29,7 +40,7 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
+      <div className={`App ${isAuthenticated ? 'authenticated' : ''}`}>
         {isAuthenticated && <Navbar />}
         <div className="main-container">
           {isAuthenticated && <Sidebar isCollapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
