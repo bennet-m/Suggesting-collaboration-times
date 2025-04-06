@@ -6,7 +6,8 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 import pickle
-from models import User
+from models import User, Assignment, TimeBlock
+from typing import List
 
 CLIENT_SECRETS_FILE = "secrets.json"
 SCOPES = [
@@ -75,19 +76,23 @@ def get_user_data(creds):
     busy_times = []
     assignments = []
     for e in events:
-        if any(e["summary"] == assignment["summary"] and e["end"] == assignment["end"] for assignment in assignments):
+        if any(e["summary"] == assignment["title"] and datetime.fromisoformat(e["end"]["dateTime"]) == assignment["due"] for assignment in assignments):
             continue
         if "start" not in e or "dateTime" not in e["start"]:
             continue
         start = datetime.fromisoformat(e["start"]["dateTime"])
         end = datetime.fromisoformat(e["end"]["dateTime"])
-        busy_times.append((start, end))
+        busy_times.append(TimeBlock(start=start, end=end))
         
-        text = (e.get("summary", "") + " " + e.get("description", "")).lower()
-        if any(k.lower() in text for k in KEYWORDS):
-            assignments.append(e)
+        if any(k.lower() in e["summary"].lower() for k in KEYWORDS):
+            assignment: Assignment = {
+                "title": e["summary"],
+                "due": end,
+                "description": e.get("description")
+            }
+            assignments.append(assignment)
 
-    busy_times = merge_intervals(sorted(busy_times))
+    busy_times = merge_intervals(sorted(busy_times, key=lambda x: x["start"]))
     free_blocks = get_free_blocks(busy_times, time_min, time_max)
     userInfo = get_user_info(creds)
     user = User(userInfo[0], userInfo[1], assignments, free_blocks)
@@ -120,16 +125,16 @@ def get_user_info(creds):
 
     return name, email
 
-def merge_intervals(intervals):
-    merged = []
-    for start, end in intervals:
-        if not merged or start > merged[-1][1]:
-            merged.append((start, end))
+def merge_intervals(intervals: List[TimeBlock]) -> List[TimeBlock]:
+    merged: List[TimeBlock] = []
+    for interval in intervals:
+        if not merged or interval["start"] > merged[-1]["end"]:
+            merged.append(interval)
         else:
-            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+            merged[-1] = TimeBlock(start=merged[-1]["start"], end=max(merged[-1]["end"], interval["end"]))
     return merged
 
-def get_free_blocks(busy_times, start_time, end_time):
+def get_free_blocks(busy_times: List[TimeBlock], start_time: datetime, end_time: datetime) -> List[TimeBlock]:
     free_blocks = []
     current = start_time
     while current < end_time:
@@ -137,15 +142,15 @@ def get_free_blocks(busy_times, start_time, end_time):
         day_end = datetime.combine(current.date(), time(23, 59), tzinfo=current.tzinfo)
         cursor = day_start
 
-        for b_start, b_end in busy_times:
-            if b_end <= day_start or b_start >= day_end:
+        for block in busy_times:
+            if block["end"] <= day_start or block["start"] >= day_end:
                 continue
-            if b_start > cursor:
-                free_blocks.append((cursor, min(b_start, day_end)))
-            cursor = max(cursor, b_end)
+            if block["start"] > cursor:
+                free_blocks.append(TimeBlock(start=cursor, end=min(block["start"], day_end)))
+            cursor = max(cursor, block["end"])
 
         if cursor < day_end:
-            free_blocks.append((cursor, day_end))
+            free_blocks.append(TimeBlock(start=cursor, end=day_end))
 
         current += timedelta(days=1)
     return free_blocks

@@ -1,9 +1,10 @@
 from flask import Flask, redirect, request, session, jsonify
-from models import User
+from models import User, Assignment, TimeBlock
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 from slugify import slugify
 import json
+from typing import List, Dict, Any, Optional, Tuple
 
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -21,7 +22,7 @@ FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
 CORS(app, supports_credentials=True, origins=FRONTEND_URL)
 
 # create_user_firebase
-def create_user_firestore(name, email):
+def create_user_firestore(name: str, email: str) -> None:
     print(f"📝 Saving {name} ({email}) to Firestore")
     
     db.collection("users").document(email).set({
@@ -32,40 +33,51 @@ def create_user_firestore(name, email):
     }, merge=True)
 
 # add assignments to specific user in firebase
-def add_assignment_to_user(email, title, due):
-    if isinstance(due, datetime):
-        due = due.isoformat()
+def add_assignment_to_user(email: str, title: str, due: datetime) -> None:
+    due_str = due.isoformat() if isinstance(due, datetime) else due
 
-    assignment = { "title": title, "due": due }
+    assignment: Assignment = {
+        "title": title,
+        "due": datetime.fromisoformat(due_str),
+        "description": None
+    }
 
     db.collection("users").document(email).update({
-        "assignments": firestore.ArrayUnion([assignment])
+        "assignments": firestore.ArrayUnion([{
+            "title": title,
+            "due": due_str,
+            "description": None
+        }])
     })
 
-    assignment_id = slugify(f"{title}_{due}")
+    assignment_id = slugify(f"{title}_{due_str}")
     print("Generated assignment_id:", assignment_id)
 
     db.collection("assignments").document(assignment_id).set({
         "title": title,
-        "due": due,
+        "due": due_str,
         "students": firestore.ArrayUnion([email])
     }, merge=True)
 
 # add free_time to specific user in firebase
-def add_free_time_to_user(email, start, end):
-    if isinstance(start, datetime):
-        start = start.isoformat()
-    if isinstance(end, datetime):
-        end = end.isoformat()
+def add_free_time_to_user(email: str, start: datetime, end: datetime) -> None:
+    start_str = start.isoformat() if isinstance(start, datetime) else start
+    end_str = end.isoformat() if isinstance(end, datetime) else end
 
-    free_time_entry = { "start": start, "end": end }
+    time_block: TimeBlock = {
+        "start": datetime.fromisoformat(start_str),
+        "end": datetime.fromisoformat(end_str)
+    }
 
     db.collection("users").document(email).update({
-        "free_time": firestore.ArrayUnion([free_time_entry])
+        "free_time": firestore.ArrayUnion([{
+            "start": start_str,
+            "end": end_str
+        }])
     })
 
 # get list of students doing same assignment
-def get_users_with_same_assignment(title, due):
+def get_users_with_same_assignment(title: str, due: str) -> List[str]:
     if isinstance(due, datetime):
         due = due.isoformat()
     assignment_id = slugify(f"{title}_{due}")
@@ -80,7 +92,7 @@ def get_users_with_same_assignment(title, due):
         return []
 
 # find overlap between two blocks
-def get_overlap_minutes(start1, end1, start2, end2):
+def get_overlap_minutes(start1: datetime, end1: datetime, start2: datetime, end2: datetime) -> Optional[Dict[str, Any]]:
     latest_start = max(start1, start2)
     earliest_end = min(end1, end2)
 
@@ -93,7 +105,7 @@ def get_overlap_minutes(start1, end1, start2, end2):
     return None
 
 # find overlap between two users
-def get_overlaps_between_users(email1, email2):
+def get_overlaps_between_users(email1: str, email2: str) -> List[Dict[str, Any]]:
     user1_doc = db.collection("users").document(email1).get()
     user2_doc = db.collection("users").document(email2).get()
 
@@ -125,7 +137,7 @@ def get_overlaps_between_users(email1, email2):
     return overlaps
 
 # list other students working on same assignment
-def get_overlapping_users_for_assignment(email, title, due):
+def get_overlapping_users_for_assignment(email: str, title: str, due: str) -> List[str]:
     if isinstance(due, datetime):
         due = due.isoformat()
     assignment_id = slugify(f"{title}_{due}")
@@ -139,15 +151,15 @@ def get_overlapping_users_for_assignment(email, title, due):
     return [s for s in students if s != email]
 
 # sync user object with Firestore
-def send_user(user: User):
+def send_user(user: User) -> None:
     user_doc = db.collection("users").document(user.email).get()
     
     if not user_doc.exists:
         create_user_firestore(user.name, user.email)
     
     for assignment in user.assignments:
-        title = assignment.get("title") or assignment.get("summary")
-        due = assignment.get("due") or assignment.get("end")
+        title = assignment["title"]
+        due = assignment["due"]
 
         if not title or not due:
             continue  # skip invalid assignments
@@ -157,9 +169,9 @@ def send_user(user: User):
 
         add_assignment_to_user(user.email, title, due)
     
-    for block in user.free_time: #changed this to account for every free
-        start = block.get("start")
-        end = block.get("end")
+    for time_block in user.free_time:
+        start = time_block["start"]
+        end = time_block["end"]
 
         if not start or not end:
             continue  # skip bad blocks
@@ -173,7 +185,7 @@ def send_user(user: User):
         add_free_time_to_user(user.email, start, end)
 
 # get all free times before an assignment due date
-def fetch_user_free_times_before_due(emails, due):
+def fetch_user_free_times_before_due(emails: List[str], due: datetime) -> List[TimeBlock]:
     due_datetime = due if isinstance(due, datetime) else datetime.fromisoformat(str(due))
     free_times = []
 
@@ -190,20 +202,20 @@ def fetch_user_free_times_before_due(emails, due):
                 continue
 
             if end <= due_datetime:
-                free_times.append((start, end))
+                free_times.append(TimeBlock(start=start, end=end))
 
     return free_times
 
 # find best overlapping time among group
-def find_largest_common_block(free_times, group_size):
+def find_largest_common_block(free_times: List[TimeBlock], group_size: int) -> Optional[Dict[str, str]]:
     timeline = []
     if group_size < 2:
         print("Group size is less than 2, found no common time.")
         return None
 
-    for start, end in free_times:
-        timeline.append((start, "start"))
-        timeline.append((end, "end"))
+    for block in free_times:
+        timeline.append((block["start"], "start"))
+        timeline.append((block["end"], "end"))
 
     timeline.sort()
     current_overlap = 0
@@ -218,7 +230,7 @@ def find_largest_common_block(free_times, group_size):
                 active_start = time
         elif event == "end":
             if current_overlap == group_size and active_start:
-                if best_start is None or (time - active_start) > (best_end - best_start):
+                if best_start is None or (time - active_start) > (best_end - best_start if best_end is not None else timedelta(0)):
                     best_start = active_start
                     best_end = time
                 active_start = None
@@ -233,16 +245,16 @@ def find_largest_common_block(free_times, group_size):
     return find_largest_common_block(free_times, group_size - 1)
 
 # main suggestion logic
-def get_suggestions(user: User):
+def get_suggestions(user: User) -> List[Dict[str, Any]]:
     suggestions = []
 
     for assignment in user.assignments:
-        title = assignment.get("title")
-        due = assignment.get("due")
+        title = assignment["title"]
+        due = assignment["due"]
         if isinstance(due, str):
             due = datetime.fromisoformat(due)
 
-        overlapping_users = get_overlapping_users_for_assignment(user.email, title, due)
+        overlapping_users = get_overlapping_users_for_assignment(user.email, title, due.isoformat())
         print("Overlapping users:", overlapping_users, title)
         if not overlapping_users:
             continue
