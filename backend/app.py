@@ -1,20 +1,9 @@
 from flask import Flask, redirect, request, session, jsonify
-from oauth import get_flow, get_credentials, get_user_data, fetch_calendar_events
+from oauth import get_flow, get_credentials, get_user_data
 from models import User
+from db import get_suggestions, send_user
+from oauth import get_user_data
 from flask_cors import CORS
-
-import firebase_admin
-from firebase_admin import credentials, firestore
-
-from slugify import slugify
-
-app = Flask(__name__)
-app.secret_key = "dev-key"
-
-cred = credentials.Certificate("/Users/marilynma/Desktop/CS/Projects/Suggesting-collaboration-times/firebase-key.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
-print("✅ Firebase initialized and Firestore client ready!")
 
 app = Flask(__name__)
 app.secret_key = "dev-key"  
@@ -49,23 +38,14 @@ def oauth2callback():
         "client_secret": creds.client_secret,
         "scopes": creds.scopes
     }
-    get_suggestions()
-    return redirect(FRONTEND_URL[0])
-
-def get_user(creds):
-    user = get_user_data(creds)
-    db.set_user(user)
-    return user
-
-def get_suggestions(user: User):
+    return main_logic()
     
-    
-@app.route("/get_suggestions")
-def get_suggestions():
+def main_logic():
     creds = get_credentials()
-    user = get_user(creds)
+    user = get_user_data(creds)
+    send_user(user)
     suggestions = get_suggestions(user)
-    
+    return jsonify(suggestions)
 
 if __name__ == "__main__":
     app.run(debug=True)

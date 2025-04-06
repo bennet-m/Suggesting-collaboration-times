@@ -19,7 +19,7 @@ SCOPES = [
 ]
 REDIRECT_URI = "http://127.0.0.1:5000/oauth2callback"
 
-KEYWORDS = ["homework", "assignment", "due", "project", "exam", "test"]
+KEYWORDS = ["homework", "assignment", "due", "project", "exam", "test", "quiz", "presentation", "report", "paper", "lab", "study", "reading", "workshop"]
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -84,7 +84,7 @@ def get_user_data(creds):
         busy_times.append((start, end))
         
         text = (e.get("summary", "") + " " + e.get("description", "")).lower()
-        if any(k in text for k in KEYWORDS):
+        if any(k.lower() in text for k in KEYWORDS):
             assignments.append(e)
 
     busy_times = merge_intervals(sorted(busy_times))
