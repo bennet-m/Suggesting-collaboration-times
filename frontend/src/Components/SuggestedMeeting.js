@@ -1,11 +1,11 @@
 import React from 'react';
 
-const SuggestedMeeting = ({ suggestedMeeting, onAdd }) => {
+const SuggestedMeeting = ({ suggestedMeeting, onAdd, bgColor }) => {
   return (
     <div
       style={{
         width: '100%',                     // Stretches across the screen
-        backgroundColor: '#4285F4',          // Blue background
+        backgroundColor: bgColor,          // Blue background
         borderRadius: '12px',                // Rounded edges
         padding: '16px',
         color: '#fff',
@@ -17,12 +17,12 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd }) => {
     >
     {/* Left Column: Assignment Title */}
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-    <h2 style={{ margin: 0 }}>{suggestedMeeting.title}</h2>
+    <h2 style={{ margin: 0, fontSize: '35px'}}>{suggestedMeeting.title}</h2>
 
         {/* Date and Time on the same row */}
-        <div style = {{display: 'flex', gap: '8px', marginTop: '8px'}}>
-            <p style={{ margin: 0 }}>{suggestedMeeting.date}</p>
-            <p style={{ margin: '0', marginLeft: '20px' }}>{suggestedMeeting.time}</p>
+        <div style = {{display: 'flex', gap: '50px', marginTop: '8px'}}>
+            <p style={{ margin: '0', fontSize: '20px' }}>{suggestedMeeting.date}</p>
+            <p style={{ margin: '0', marginLeft: '10px', fontSize: '20px' }}>{suggestedMeeting.time}</p>
         </div>
 
     </div>
