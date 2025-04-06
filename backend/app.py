@@ -57,21 +57,11 @@ def get_current_user():
         user = get_user_data(creds)
         print(f"Got user data: {user.name}, {user.email}")
         
-        # Initialize empty lists for assignments and free_time if they don't exist
-        assignments = []
-        free_time = []
-        
-        # If the user object has these attributes, use them
-        if hasattr(user, 'assignments'):
-            assignments = [{"title": a["title"], "due": a["due"].isoformat()} for a in user.assignments]
-        if hasattr(user, 'free_time'):
-            free_time = [{"start": t["start"].isoformat(), "end": t["end"].isoformat()} for t in user.free_time]
-        
         response_data = {
             "name": user.name,
             "email": user.email,
-            "assignments": assignments,
-            "free_time": free_time
+            "assignments": [{"title": a['title'], "due": a['due'].isoformat()} for a in user.assignments],
+            "free_time": [{"start": t['start'].isoformat(), "end": t['end'].isoformat()} for t in user.free_time]
         }
         print(f"Sending response: {response_data}")
         return jsonify(response_data)
@@ -82,25 +72,11 @@ def get_current_user():
 @app.route("/api/suggestions", methods=["POST"])
 def get_suggestions_endpoint():
     try:
-        print("Getting suggestions...")
         creds = get_credentials()
         user = get_user_data(creds)
-        print(f"Got user data for suggestions: {user.name}, {user.email}")
-        
-        # Initialize empty lists if they don't exist
-        if not hasattr(user, 'assignments'):
-            user.assignments = []
-        if not hasattr(user, 'free_time'):
-            user.free_time = []
-            
-        print(f"User assignments: {len(user.assignments)}, free time slots: {len(user.free_time)}")
-        
         suggestions = get_suggestions(user)
-        print(f"Generated {len(suggestions)} suggestions")
-        
         return jsonify({"suggestions": suggestions})
     except Exception as e:
-        print(f"Error in get_suggestions_endpoint: {str(e)}")
         return jsonify({"error": str(e)}), 401
 
 @app.route("/api/user", methods=["POST"])

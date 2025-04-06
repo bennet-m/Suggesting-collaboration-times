@@ -40,8 +40,8 @@ const userService = {
         console.error('Error fetching user:', error);
         // Fallback mock data
         resolve({
-          name: "Alice",
-          email: "alice@example.com",
+          name: "Bennet",
+          email: "bmatazzoni@g.hmc.edu",
           assignments: [
             { title: "CS225 Assignment 2", due: "2025-04-07T23:59" },
             { title: "MATH241 Quiz", due: "2025-04-09T12:00" }

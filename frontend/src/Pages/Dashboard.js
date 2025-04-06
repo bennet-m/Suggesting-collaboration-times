@@ -127,11 +127,29 @@ export default function Dashboard({ userData }) {
           const endDate = new Date(suggestion.end);
           const dueDate = new Date(suggestion.due);
           
+          // Format time with explicit timezone handling
+          const formatTime = (date) => {
+            // Create a new date object to avoid modifying the original
+            const adjustedDate = new Date(date);
+            
+            // If the hour is before 9am, set it to 9am
+            if (adjustedDate.getHours() < 9) {
+              adjustedDate.setHours(9);
+              adjustedDate.setMinutes(0);
+            }
+            
+            return adjustedDate.toLocaleTimeString('en-US', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              timeZone: 'America/Los_Angeles' // Adjust this to your desired timezone
+            });
+          };
+          
           return {
             id: `suggested-${index}`,
             title: suggestion.assignment,
             date: startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }),
-            time: `${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+            time: `${formatTime(startDate)} - ${formatTime(endDate)}`,
             dueDate: dueDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
             assignment: suggestion.assignment,
             attendees: formatAttendeesWithEmails("Classmates"),

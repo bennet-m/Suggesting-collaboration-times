@@ -115,8 +115,8 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                                 <i className="fas fa-user-circle"></i>
                             </div>
                             <div className="profile-info">
-                                <h4>{userData.name}</h4>
-                                <p>{userData.email}</p>
+                                <h4>{"Bennet"}</h4>
+                                <p>{"bmatazzoni@g.hmc.edu"}</p>
                             </div>
                         </div>
                         <div className="profile-actions">
