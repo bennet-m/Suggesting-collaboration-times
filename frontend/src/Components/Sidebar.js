@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
 import userService from '../services/userService';
 import { useLocation, useNavigate } from 'react-router-dom';
+import NotImplementedPopup from './NotImplementedPopup';
 
 export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
     const [activeSection, setActiveSection] = useState('profile');
@@ -14,8 +15,28 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
     const [showAddFriendPopup, setShowAddFriendPopup] = useState(false);
     const [friendEmail, setFriendEmail] = useState('');
     const [classmates, setClassmates] = useState([]);
+    const [notImplementedPopup, setNotImplementedPopup] = useState({
+        isOpen: false,
+        featureName: ''
+    });
     const location = useLocation();
     const navigate = useNavigate();
+    
+    // Show not implemented popup
+    const showNotImplementedFeature = (featureName) => {
+        setNotImplementedPopup({
+            isOpen: true,
+            featureName
+        });
+    };
+    
+    // Close not implemented popup
+    const closeNotImplementedPopup = () => {
+        setNotImplementedPopup({
+            isOpen: false,
+            featureName: ''
+        });
+    };
     
     // Logout function
     const handleLogout = () => {
@@ -156,8 +177,8 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                         </div>
                         <div className="profile-actions">
                             <ul>
-                                <li><i className="fas fa-cog"></i> Settings</li>
-                                <li><i className="fas fa-user-edit"></i> Edit Profile</li>
+                                <li onClick={() => showNotImplementedFeature("Settings")}><i className="fas fa-cog"></i> Settings</li>
+                                <li onClick={() => showNotImplementedFeature("Edit Profile")}><i className="fas fa-user-edit"></i> Edit Profile</li>
                                 <li onClick={handleLogout} className="logout-item">
                                     <i className="fas fa-sign-out-alt"></i> Logout
                                 </li>
@@ -174,7 +195,7 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                 <h3>Groups</h3>
                 <div className="groups-list">
                     <div className="add-group">
-                        <button className="add-button">
+                        <button className="add-button" onClick={() => showNotImplementedFeature("Create New Group")}>
                             <i className="fas fa-plus" style={{paddingLeft: '10px'}}></i> Create New Group
                         </button>
                     </div>
@@ -182,7 +203,7 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                     {studyGroups.length > 0 ? (
                         <ul>
                             {studyGroups.map((group, index) => (
-                                <li key={index}>
+                                <li key={index} onClick={() => showNotImplementedFeature(`${group.name} Group`)}>
                                     <i className="fas fa-users"></i>
                                     <span>{group.name}</span>
                                 </li>
@@ -198,13 +219,13 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
             <div className="section-panel">
                 <h3>Friends</h3>
                 <div className="friends-search">
-                    <input type="text" placeholder="Search friends..." />
+                    <input type="text" placeholder="Search friends..." onChange={() => showNotImplementedFeature("Search Friends")} />
                 </div>
                 <div className="friends-list">
                     {users.length > 0 ? (
                         <ul>
                             {users.filter(user => user.name !== (userData?.name || '')).map((user, index) => (
-                                <li key={index}>
+                                <li key={index} onClick={() => showNotImplementedFeature(`Chat with ${user.name}`)}>
                                     <i className="fas fa-user"></i>
                                     <span>{user.name}</span>
                                 </li>
@@ -227,7 +248,7 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                         <ul>
                             {classmates.map((classmate, index) => (
                                 <li key={index} className="classmate-item">
-                                    <div className="classmate-info">
+                                    <div className="classmate-info" onClick={() => showNotImplementedFeature(`View ${classmate.name}'s Profile`)}>
                                         <i className="fas fa-user-graduate"></i>
                                         <span>{classmate.name}</span>
                                         <small className="class-label">{classmate.class}</small>
@@ -288,7 +309,7 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                     {assignments.length > 0 ? (
                         <ul className="assignments-list">
                             {assignments.sort((a, b) => new Date(a.due) - new Date(b.due)).map((assignment, index) => (
-                                <li key={index} className="assignment-item">
+                                <li key={index} className="assignment-item" onClick={() => showNotImplementedFeature(`View Assignment: ${assignment.title}`)}>
                                     <div className="assignment-title">
                                         <i className="fas fa-file-alt"></i>
                                         <span>{assignment.title}</span>
@@ -308,7 +329,7 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                     {userData?.free_time ? (
                         <ul className="time-slots-list">
                             {userData.free_time.map((slot, index) => (
-                                <li key={index} className="time-slot-item">
+                                <li key={index} className="time-slot-item" onClick={() => showNotImplementedFeature("Manage Free Time")}>
                                     <i className="fas fa-calendar-alt"></i>
                                     <span>{formatDate(slot.start)} - {new Date(slot.end).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}</span>
                                 </li>
@@ -376,6 +397,13 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                     <i className="fas fa-times" onClick={onToggle}></i>
                 )}
             </div>
+            
+            {/* Add the NotImplementedPopup */}
+            <NotImplementedPopup 
+                isOpen={notImplementedPopup.isOpen} 
+                onClose={closeNotImplementedPopup} 
+                featureName={notImplementedPopup.featureName} 
+            />
         </div>
     );
 }

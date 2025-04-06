@@ -34,6 +34,42 @@ const colorSchemes = {
   }
 };
 
+// Attendee data with names and email addresses
+const attendeeData = {
+  'Bob': 'bob.smith@example.com',
+  'Alice': 'alice.johnson@example.com',
+  'Charlie': 'charlie.brown@example.com',
+  'Farah': 'farah.ahmed@example.com',
+  'John': 'john.doe@example.com',
+  'Jane': 'jane.miller@example.com',
+  'Jenny': 'jenny.wilson@example.com',
+  'Sabrina': 'sabrina.chen@example.com',
+  'Eli': 'eli.rodriguez@example.com',
+  'Dana': 'dana.patel@example.com',
+  'Jim': 'jim.thompson@example.com'
+};
+
+// Current user's name and email
+const currentUser = {
+  name: 'You',
+  email: 'your.email@example.com'
+};
+
+// Function to format attendees with email addresses
+const formatAttendeesWithEmails = (attendeeNames) => {
+  const nameArray = attendeeNames.split(',').map(name => name.trim());
+  // Add the current user to the attendees list
+  const allAttendees = [currentUser.name, ...nameArray];
+  
+  return allAttendees.map(name => {
+    if (name === currentUser.name) {
+      return `${name} <${currentUser.email}>`;
+    }
+    const email = attendeeData[name] || `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`;
+    return `${name} <${email}>`;
+  }).join(', ');
+};
+
 export default function Dashboard() {
   return (
     <div style={{ 
@@ -64,7 +100,8 @@ export default function Dashboard() {
             time: "7 - 9 PM",
             dueDate: "April 17",
             assignment: "HW 6",
-            attendees: "Bob, Alice, Charlie"
+            attendees: formatAttendeesWithEmails("Bob, Alice, Charlie"),
+            location: "Millikan Lab, Room 2024"
           }}
           colorScheme={colorSchemes.study}
           onAdd={() => console.log("Added Partner Work Sesh")}
@@ -80,7 +117,8 @@ export default function Dashboard() {
             time: "1 - 2 PM",
             dueDate: "April 16",
             assignment: "Project 3",
-            attendees: "Farah, John, Jane"
+            attendees: formatAttendeesWithEmails("Farah, John, Jane"),
+            location: "Zoom: https://zoom.us/j/123456789"
           }}
           colorScheme={colorSchemes.project}
           onAdd={() => console.log("Added Project Sync")}
@@ -96,7 +134,8 @@ export default function Dashboard() {
             time: "5 - 6 PM",
             dueDate: "April 18",
             assignment: "Reading 4",
-            attendees: "Jenny, Sabrina, Eli, Dana"
+            attendees: formatAttendeesWithEmails("Jenny, Sabrina, Eli, Dana"),
+            location: "Library Study Room 303"
           }}
           colorScheme={colorSchemes.event}
           onAdd={() => console.log("Added Reading Group")}
@@ -112,7 +151,8 @@ export default function Dashboard() {
             time: "3 - 5 PM",
             dueDate: "April 19",
             assignment: "Final Exam",
-            attendees: "Jim, Bob, Alice, Charlie"
+            attendees: formatAttendeesWithEmails("Jim, Bob, Alice, Charlie"),
+            location: "Academic Building, Room 101"
           }}
           colorScheme={colorSchemes.deadline}
           onAdd={() => console.log("Added Final Review")}
@@ -128,7 +168,8 @@ export default function Dashboard() {
             time: "10 - 11 AM",
             dueDate: "No deadline",
             assignment: "Social",
-            attendees: "Dana, Eli, Sabrina, Jenny"
+            attendees: formatAttendeesWithEmails("Dana, Eli, Sabrina, Jenny"),
+            location: "Campus Coffee Shop"
           }}
           colorScheme={colorSchemes.casual}
           onAdd={() => console.log("Added Study Break Coffee")}
