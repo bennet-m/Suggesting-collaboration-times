@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
 import userService from '../services/userService';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
     const [activeSection, setActiveSection] = useState('profile');
@@ -12,6 +12,16 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
     const [navbarHeight, setNavbarHeight] = useState(56); // Default navbar height
     const [navbarVisible, setNavbarVisible] = useState(true);
     const location = useLocation();
+    const navigate = useNavigate();
+    
+    // Logout function
+    const handleLogout = () => {
+        // Clear user data from localStorage
+        localStorage.removeItem('userEmail');
+        // Redirect to login page
+        navigate('/login');
+        // Page will reload and App.js will detect user is not authenticated
+    };
     
     // Check if navbar is visible and get its height
     useEffect(() => {
@@ -113,7 +123,9 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                             <ul>
                                 <li><i className="fas fa-cog"></i> Settings</li>
                                 <li><i className="fas fa-user-edit"></i> Edit Profile</li>
-                                <li><i className="fas fa-sign-out-alt"></i> Logout</li>
+                                <li onClick={handleLogout} className="logout-item">
+                                    <i className="fas fa-sign-out-alt"></i> Logout
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -230,8 +242,8 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
     return (
         <div className="sidebar-container" style={sidebarStyle}>
             <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`} >
-                <div className="sidebar-header">
-                    <h3>Study Buddy</h3>
+                <div className="sidebar-header" style={{ height: '30px' }}>
+                    <h3></h3>
                 </div>
                 <div className="icon-menu">
                     <div 
