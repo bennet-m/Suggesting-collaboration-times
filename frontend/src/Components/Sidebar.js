@@ -11,6 +11,9 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
     const [studyGroups, setStudyGroups] = useState([]);
     const [navbarHeight, setNavbarHeight] = useState(56); // Default navbar height
     const [navbarVisible, setNavbarVisible] = useState(true);
+    const [showAddFriendPopup, setShowAddFriendPopup] = useState(false);
+    const [friendEmail, setFriendEmail] = useState('');
+    const [classmates, setClassmates] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
     
@@ -79,6 +82,14 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                 // Get study groups
                 const groups = await userService.getStudyGroups();
                 setStudyGroups(groups);
+                
+                // Mock classmates data
+                const mockClassmates = allUsers
+                    .filter(user => user.name !== (currentUser?.name || ''))
+                    .slice(0, 3) // Just take first 3 users as classmates for demo
+                    .map(user => ({...user, class: 'CS 101'})); // Add class info
+                
+                setClassmates(mockClassmates);
             } catch (error) {
                 console.error('Error loading data:', error);
             }
@@ -86,6 +97,30 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
         
         loadData();
     }, []);
+
+    // Add a friend by email
+    const handleAddFriend = () => {
+        if (friendEmail.trim() === '') return;
+        
+        // Mock adding a friend - in a real app this would send a request to the backend
+        const newFriend = {
+            id: users.length + 1,
+            name: friendEmail.split('@')[0], // Generate a name from the email
+            email: friendEmail
+        };
+        
+        setUsers(prevUsers => [...prevUsers, newFriend]);
+        setFriendEmail('');
+        setShowAddFriendPopup(false);
+    };
+    
+    // Add classmate to friends list
+    const addClassmateToFriends = (classmate) => {
+        // Check if the classmate is already in the friends list
+        if (!users.some(user => user.id === classmate.id)) {
+            setUsers(prevUsers => [...prevUsers, classmate]);
+        }
+    };
 
     const setSection = (section) => {
         setActiveSection(section);
@@ -140,7 +175,7 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                 <div className="groups-list">
                     <div className="add-group">
                         <button className="add-button">
-                            <i className="fas fa-plus"></i> Create New Group
+                            <i className="fas fa-plus" style={{paddingLeft: '10px'}}></i> Create New Group
                         </button>
                     </div>
                     <h4>Study Groups</h4>
@@ -180,10 +215,69 @@ export default function Sidebar({ isCollapsed = false, onToggle = () => {} }) {
                     )}
                 </div>
                 <div className="friend-actions">
-                    <button className="action-button">
-                        <i className="fas fa-user-plus"></i> Add Friend
+                    <button className="action-button" onClick={() => setShowAddFriendPopup(true)}>
+                        <i className="fas fa-user-plus "></i> Add Friend
                     </button>
                 </div>
+                
+                {/* Classmates Section */}
+                <h4 className="section-title">Classmates</h4>
+                <div className="classmates-list">
+                    {classmates.length > 0 ? (
+                        <ul>
+                            {classmates.map((classmate, index) => (
+                                <li key={index} className="classmate-item">
+                                    <div className="classmate-info">
+                                        <i className="fas fa-user-graduate"></i>
+                                        <span>{classmate.name}</span>
+                                        <small className="class-label">{classmate.class}</small>
+                                    </div>
+                                    <button 
+                                        className="add-classmate-button"
+                                        onClick={() => addClassmateToFriends(classmate)}
+                                        style={{fontSize: '20px'}}
+                                    >
+                                        +
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No classmates found</p>
+                    )}
+                </div>
+                
+                {/* Add Friend Popup */}
+                {showAddFriendPopup && (
+                    <div className="popup-overlay">
+                        <div className="add-friend-popup">
+                            <div className="popup-header">
+                                <h3>Add Friend</h3>
+                                <button className="close-button" onClick={() => setShowAddFriendPopup(false)}>
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div className="popup-content">
+                                <label htmlFor="friendEmail">Friend's Email:</label>
+                                <input 
+                                    type="email" 
+                                    id="friendEmail" 
+                                    value={friendEmail} 
+                                    onChange={(e) => setFriendEmail(e.target.value)}
+                                    placeholder="Enter email address" 
+                                />
+                                <div className="popup-actions">
+                                    <button className="cancel-button" onClick={() => setShowAddFriendPopup(false)}>
+                                        Cancel
+                                    </button>
+                                    <button className="add-button" onClick={handleAddFriend}>
+                                        Add Friend
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         ),
         classes: (
