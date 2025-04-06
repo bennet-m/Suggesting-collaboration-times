@@ -14,10 +14,10 @@ export default function About() {
             <h2 style={{ fontSize: '1.8rem', marginTop: '2rem', color: '#4285F4' }}>Meet the Team</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
                 {[
-                    { name: 'Marilyn Ma (CMC ’27)', src: '/images/placeholder.jpg' },
-                    { name: 'Bennet Matazzoni (HMC ’26)', src: '/images/placeholder.jpg' },
                     { name: 'AJ Matheson-Lieber (CMC ’27)', src: '/images/placeholder.jpg' },
-                    { name: 'Nico Riley (CMC ’27)', src: '/images/placeholder.jpg' }
+                    { name: 'Bennet Matazzoni (HMC ’26)', src: '/images/placeholder.jpg' },
+                    { name: 'Nico Riley (CMC ’27)', src: '/images/placeholder.jpg' },
+                    { name: 'Marilyn Ma (CMC ’27)', src: '/images/placeholder.jpg' }
                 ].map((member, i) => (
                     <div key={i} style={{ textAlign: 'center', maxWidth: '150px' }}>
                         <img 
@@ -36,7 +36,7 @@ export default function About() {
             </div>
                 
                 <h2 style={{ fontSize: '1.8rem', marginTop: '2rem', color: '#4285F4' }}>Key Features</h2>
-                <ul style={{ listStyleType: 'disc', marginLeft: '2rem', marginBottom: '1.5rem' }}>
+                <ul style={{ listStyleType: 'disc', margin: 0, paddingLeft: '1.2rem', marginBottom: '1.5rem' }}>
                     <li style={{ marginBottom: '0.5rem' }}>Track assignments and due dates</li>
                     <li style={{ marginBottom: '0.5rem' }}>Connect with Google Calendar for availability</li>
                     <li style={{ marginBottom: '0.5rem' }}>Find matching free time slots with classmates</li>
@@ -47,7 +47,7 @@ export default function About() {
                 <p style={{ marginBottom: '1.5rem' }}>
                     StudySync uses Google Calendar integration to fetch your schedule and identify free time slots. It then matches your availability with other students working on the same assignments to suggest optimal collaboration times.
                 </p>
-                <ol style={{ marginLeft: '2rem', marginBottom: '1.5rem' }}>
+                <ol style={{ marginLeft: '2rem', paddingLeft: '1.2rem', marginBottom: '1.5rem' }}>
                     <li style={{ marginBottom: '0.5rem' }}>Add your assignments to the platform</li>
                     <li style={{ marginBottom: '0.5rem' }}>Connect your Google Calendar</li>
                     <li style={{ marginBottom: '0.5rem' }}>Specify your free time slots</li>
