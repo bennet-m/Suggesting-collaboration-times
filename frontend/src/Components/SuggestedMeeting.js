@@ -6,6 +6,7 @@ import backgroundImage from '../Assets/Images/Bookclp.png';
 const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme, isUpcoming }) => {
   const colors = colorScheme;
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const DEFAULT_MEETING_DURATION = 1; // 1 default meeting time
   
   // Basic Google Calendar icon SVG (Thank you Claude)
@@ -66,6 +67,37 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme, isUpcoming }) 
         strokeLinecap="round" 
         strokeLinejoin="round"
       />
+    </svg>
+  );
+  
+  // Email Icon for the modal
+  const EmailIcon = () => (
+    <svg 
+      width="20" 
+      height="20" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ marginRight: '8px' }}
+    >
+      <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+      <path d="M2 7L12 14L22 7" stroke="currentColor" strokeWidth="2"/>
+    </svg>
+  );
+  
+  // Friend Icon
+  const FriendIcon = ({ isFriend }) => (
+    <svg 
+      width="16" 
+      height="16" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ marginRight: '8px', color: isFriend ? '#47D185' : '#ccc' }}
+    >
+      <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2"/>
+      <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2"/>
+      {isFriend && <path d="M8.5 8.5L15.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>}
     </svg>
   );
   
@@ -481,398 +513,749 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme, isUpcoming }) 
     }
   };
   
+  // Function to open modal
+  const handleCardClick = () => {
+    if (!isUpcoming) {
+      setShowModal(true);
+    }
+  };
+  
+  // Function to close modal
+  const handleCloseModal = (e) => {
+    if (e) e.stopPropagation();
+    setShowModal(false);
+  };
+  
+  // Function to handle sending a group email
+  const handleSendGroupEmail = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Extract email addresses from the format "Name <email@example.com>"
+    const emailRegex = /<([^>]+)>/g;
+    const emails = [];
+    let match;
+    const attendeesStr = suggestedMeeting.attendees;
+    
+    // Use regex to extract all email addresses
+    while ((match = emailRegex.exec(attendeesStr)) !== null) {
+      if (match[1] && match[1].includes('@')) {
+        emails.push(match[1]);
+      }
+    }
+    
+    // Create mailto URL with all recipients
+    const mailtoUrl = `mailto:?bcc=${emails.join(',')}`;
+    window.open(mailtoUrl, '_blank');
+  };
+  
+  // Extract member names and check friendship status
+  const getMembers = () => {
+    // For demo purposes, we'll consider some members as friends
+    const friends = ['Nico', 'AJ', 'Bennet', 'Alice', 'Eli']; 
+    
+    return suggestedMeeting.attendees
+      .split(',')
+      .map(attendee => {
+        const name = attendee.trim().split('<')[0].trim();
+        // Skip "You" from the list
+        if (name === 'You') return null;
+        
+        const email = attendee.includes('<') 
+          ? attendee.match(/<([^>]+)>/)[1] 
+          : null;
+          
+        return {
+          name,
+          email,
+          isFriend: friends.includes(name)
+        };
+      })
+      .filter(Boolean); // Remove null entries
+  };
+  
   return (
-    <div
-      style={{
-        width: '100%',
-        backgroundColor: colors.main,
-        borderRadius: '16px',
-        padding: '24px',
-        color: colors.text,
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
-        boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: '28%',
-        backgroundPosition: '28% 50%',
-        backgroundRepeat: 'no-repeat',
-        marginBottom: '16px'
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.2)';
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.15)';
-      }}
-    >
-      {/* Overlay gradient for better text readability */}
+    <>
       <div
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `linear-gradient(135deg, ${colors.main} 40%, transparent 100%)`,
-          opacity: 0.85,
-          zIndex: 0,
-          borderRadius: '16px'
-        }}
-      />
-      
-      {/* Decorative left stripe */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          width: '8px',
-          height: '100%',
-          backgroundColor: colors.stripe,
-          borderTopLeftRadius: '16px',
-          borderBottomLeftRadius: '16px',
-          zIndex: 1
-        }}
-      />
-      
-      {/* Background accent elements */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: '-40px',
-          right: '-30px',
-          width: '150px',
-          height: '150px',
-          borderRadius: '50%',
-          backgroundColor: colors.accent,
-          opacity: '0.2',
-          zIndex: 1
-        }}
-      />
-      
-      <div 
-        style={{
-          position: 'absolute',
-          bottom: '-60px',
-          right: '40px',
-          width: '120px',
-          height: '120px',
-          borderRadius: '50%',
-          backgroundColor: colors.accent,
-          opacity: '0.15',
-          zIndex: 1
-        }}
-      />
-      
-      {/* Top section with headers - Date, Assignment, and Due Date */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
-        width: '100%',
-        height: '30px',
-        position: 'relative',
-        zIndex: 2,
-        marginBottom: '8px'
-      }}>
-        {/* Date header */}
-        <div style={{
-          marginBottom: '0',
-          fontSize: '15px',
-          fontWeight: '600',
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-          opacity: '0.7',
-          textAlign: 'left',
-          minWidth: '180px',
-          marginRight: '24px',
-          alignSelf: 'flex-end'
-        }}>
-          Date
-        </div>
-        
-        {/* Assignment header */}
-        <div style={{
-          marginBottom: '0',
-          fontSize: '15px',
-          fontWeight: '600',
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-          opacity: '0.7',
-          flex: 1,
-          textAlign: 'left',
-          alignSelf: 'flex-end'
-        }}>
-          Assignment
-        </div>
-        
-        {/* Due date section */}
-        <div style={{ 
+          width: '100%',
+          backgroundColor: colors.main,
+          borderRadius: '16px',
+          padding: '24px',
+          color: colors.text,
           display: 'flex',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          padding: '7.5px 16px',
-          borderRadius: '24px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-          height: '24px',
-          flexShrink: 0,
-          marginLeft: '15px'
-        }}>
-          <div style={{
-            display: 'inline-block',
-            width: '10px',
-            height: '8px',
+          flexDirection: 'column',
+          boxSizing: 'border-box',
+          boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+          position: 'relative',
+          overflow: 'hidden',
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: '28%',
+          backgroundPosition: '28% 50%',
+          backgroundRepeat: 'no-repeat',
+          marginBottom: '16px',
+          cursor: isUpcoming ? 'default' : 'pointer'
+        }}
+        onClick={handleCardClick}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-4px)';
+          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.15)';
+        }}
+      >
+        {/* Overlay gradient for better text readability */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `linear-gradient(135deg, ${colors.main} 40%, transparent 100%)`,
+            opacity: 0.85,
+            zIndex: 0,
+            borderRadius: '16px'
+          }}
+        />
+        
+        {/* Decorative left stripe */}
+        <div 
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '8px',
+            height: '100%',
+            backgroundColor: colors.stripe,
+            borderTopLeftRadius: '16px',
+            borderBottomLeftRadius: '16px',
+            zIndex: 1
+          }}
+        />
+        
+        {/* Background accent elements */}
+        <div 
+          style={{
+            position: 'absolute',
+            top: '-40px',
+            right: '-30px',
+            width: '150px',
+            height: '150px',
             borderRadius: '50%',
             backgroundColor: colors.accent,
-            marginRight: '8px'
-          }}></div>
-          <p style={{ 
-            margin: 0, 
-            fontWeight: 'bold', 
-            fontSize: '16px' 
-          }}>
-            Due: {suggestedMeeting.dueDate}
-          </p>
-        </div>
-      </div>
-      
-      {/* Main content row with Date and Assignment */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
-        width: '100%',
-        position: 'relative',
-        zIndex: 2,
-        marginBottom: '16px'
-      }}>
-        {/* Date and Time section */}
+            opacity: '0.2',
+            zIndex: 1
+          }}
+        />
+        
+        <div 
+          style={{
+            position: 'absolute',
+            bottom: '-60px',
+            right: '40px',
+            width: '120px',
+            height: '120px',
+            borderRadius: '50%',
+            backgroundColor: colors.accent,
+            opacity: '0.15',
+            zIndex: 1
+          }}
+        />
+        
+        {/* Top section with headers - Date, Assignment, and Due Date */}
         <div style={{ 
           display: 'flex', 
-          flexDirection: 'column', 
-          minWidth: '180px',
-          marginRight: '24px'
+          flexDirection: 'row', 
+          justifyContent: 'space-between', 
+          width: '100%',
+          height: '30px',
+          position: 'relative',
+          zIndex: 2,
+          marginBottom: '8px'
         }}>
-          {/* Date and Time with calendar icon */}
+          {/* Date header */}
           <div style={{
-            display: 'flex', 
-            alignItems: 'center', 
-            padding: '12px 16px',
-            backgroundColor: 'rgba(255, 255, 255, 0.18)',
-            backdropFilter: 'blur(5px)',
-            borderRadius: '12px',
+            marginBottom: '0',
+            fontSize: '15px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            opacity: '0.7',
             textAlign: 'left',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            height: '56px'
+            minWidth: '180px',
+            marginRight: '24px',
+            alignSelf: 'flex-end'
           }}>
-            <div style={{
-              borderLeft: `4px solid ${colors.accent}`,
-              paddingLeft: '10px'
-            }}>
-              <p style={{ 
-                margin: '0', 
-                fontSize: '20px', 
-                fontWeight: '700',
-                letterSpacing: '-0.3px',
-                textAlign: 'left'
-              }}>
-                {suggestedMeeting.date}
-              </p>
-              <p style={{ 
-                margin: '2px 0 0 0', 
-                fontSize: '16px', 
-                opacity: '0.9',
-                fontWeight: '500'
-              }}>
-                {suggestedMeeting.time}
-              </p>
-            </div>
+            Date
           </div>
-        </div>
-
-        {/* Assignment content */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          flex: 1,
-          width: '100%'
-        }}>
+          
+          {/* Assignment header */}
+          <div style={{
+            marginBottom: '0',
+            fontSize: '15px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            opacity: '0.7',
+            flex: 1,
+            textAlign: 'left',
+            alignSelf: 'flex-end'
+          }}>
+            Assignment
+          </div>
+          
+          {/* Due date section */}
           <div style={{ 
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-start',
-            width: '100%',
-            height: '56px',
-            padding: '12px 16px',
-            borderRadius: '14px',
-            fontSize: '2em',
-            fontWeight: '700',
-            letterSpacing: '-0.5px',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
-            backdropFilter: 'blur(3px)',
-            boxSizing: 'border-box'
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            padding: '7.5px 16px',
+            borderRadius: '24px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+            height: '24px',
+            flexShrink: 0,
+            marginLeft: '15px'
           }}>
-            {suggestedMeeting.assignment}
+            <div style={{
+              display: 'inline-block',
+              width: '10px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: colors.accent,
+              marginRight: '8px'
+            }}></div>
+            <p style={{ 
+              margin: 0, 
+              fontWeight: 'bold', 
+              fontSize: '16px' 
+            }}>
+              Due: {suggestedMeeting.dueDate}
+            </p>
           </div>
         </div>
-      </div>
+        
+        {/* Main content row with Date and Assignment */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'row', 
+          justifyContent: 'space-between', 
+          width: '100%',
+          position: 'relative',
+          zIndex: 2,
+          marginBottom: '16px'
+        }}>
+          {/* Date and Time section */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            minWidth: '180px',
+            marginRight: '24px'
+          }}>
+            {/* Date and Time with calendar icon */}
+            <div style={{
+              display: 'flex', 
+              alignItems: 'center', 
+              padding: '12px 16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.18)',
+              backdropFilter: 'blur(5px)',
+              borderRadius: '12px',
+              textAlign: 'left',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              height: '56px'
+            }}>
+              <div style={{
+                borderLeft: `4px solid ${colors.accent}`,
+                paddingLeft: '10px'
+              }}>
+                <p style={{ 
+                  margin: '0', 
+                  fontSize: '20px', 
+                  fontWeight: '700',
+                  letterSpacing: '-0.3px',
+                  textAlign: 'left'
+                }}>
+                  {suggestedMeeting.date}
+                </p>
+                <p style={{ 
+                  margin: '2px 0 0 0', 
+                  fontSize: '16px', 
+                  opacity: '0.9',
+                  fontWeight: '500'
+                }}>
+                  {suggestedMeeting.time}
+                </p>
+              </div>
+            </div>
+          </div>
 
-      {/* Bottom row - Attendees section */}
-      <div style={{ 
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%', 
-        padding: '16px 20px',
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        borderRadius: '12px',
-        position: 'relative',
-        zIndex: 2,
-        backdropFilter: 'blur(3px)',
-        boxSizing: 'border-box'
-      }}>
-        <div style={{
+          {/* Assignment content */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            flex: 1,
+            width: '100%'
+          }}>
+            <div style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              width: '100%',
+              height: '56px',
+              padding: '12px 16px',
+              borderRadius: '14px',
+              fontSize: '2em',
+              fontWeight: '700',
+              letterSpacing: '-0.5px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
+              backdropFilter: 'blur(3px)',
+              boxSizing: 'border-box'
+            }}>
+              {suggestedMeeting.assignment}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom row - Attendees section */}
+        <div style={{ 
           display: 'flex',
-          flexDirection: 'row',
-          flex: 1,
-          gap: '10px',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          marginRight: '15px',
-          minWidth: 0,
-          overflow: 'hidden'
+          width: '100%', 
+          padding: '16px 20px',
+          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          borderRadius: '12px',
+          position: 'relative',
+          zIndex: 2,
+          backdropFilter: 'blur(3px)',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             display: 'flex',
+            flexDirection: 'row',
+            flex: 1,
+            gap: '10px',
             alignItems: 'center',
-            justifyContent: 'center',
-            whiteSpace: 'nowrap',
-            flexShrink: 0
+            marginRight: '15px',
+            minWidth: 0,
+            overflow: 'hidden'
           }}>
             <div style={{
-              width: '6px',
-              height: '20px',
-              backgroundColor: colors.accent,
-              marginRight: '10px',
-              borderRadius: '3px'
-            }}></div>
-            <p style={{ 
-              margin: '0', 
-              fontSize: '15px', 
-              fontWeight: '600',
-              textTransform: 'uppercase',
-              letterSpacing: '1px',
-              opacity: '0.9',
-              color: colors.accent
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}>
-              Attendees
+              <div style={{
+                width: '6px',
+                height: '20px',
+                backgroundColor: colors.accent,
+                marginRight: '10px',
+                borderRadius: '3px'
+              }}></div>
+              <p style={{ 
+                margin: '0', 
+                fontSize: '15px', 
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                opacity: '0.9',
+                color: colors.accent
+              }}>
+                Attendees
+              </p>
+            </div>
+            <p style={{ 
+              margin: '0',
+              fontSize: '16px',
+              fontWeight: '500',
+              lineHeight: '1.5',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              {/* Display only names (not emails) in the UI */}
+              {suggestedMeeting.attendees
+                .split(',')
+                .map(attendee => attendee.trim().split('<')[0].trim())
+                .join(', ')}
             </p>
           </div>
-          <p style={{ 
-            margin: '0',
-            fontSize: '16px',
-            fontWeight: '500',
-            lineHeight: '1.5',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            {/* Display only names (not emails) in the UI */}
-            {suggestedMeeting.attendees
-              .split(',')
-              .map(attendee => attendee.trim().split('<')[0].trim())
-              .join(', ')}
-          </p>
-        </div>
-        {/* Join button with tooltip */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          {!isUpcoming ? <button
-            onClick={handleJoinClick}
-            style={{
-              backgroundColor: colors.accent,
-              color: '#fff',
-              border: 'none',
-              width: '140px',
-              height: '48px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '18px',
-              transition: 'all 0.3s ease',
-              padding: '0 12px',
-              outline: 'none',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-              borderRadius: '12px',
-              position: 'relative',
-              overflow: 'hidden',
-              flexShrink: 0,
-              transform: 'scale(1)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.25)';
-              setShowTooltip(true);
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-              setShowTooltip(false);
-            }}
-            onFocus={() => setShowTooltip(true)}
-            onBlur={() => setShowTooltip(false)}
-          >
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              {isUpcoming ? <CheckIcon /> : <CalendarIcon />}
-              <span>Join!</span>
-            </span>
-          </button> : <div></div>}
-          
-          {/* Tooltip */}
-          {showTooltip && (
-            <div style={{
-              position: 'absolute',
-              bottom: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              marginBottom: '8px',
-              backgroundColor: 'rgba(0, 0, 0, 0.75)',
-              color: '#fff',
-              padding: '8px 12px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '500',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              zIndex: 10,
-              pointerEvents: 'none'
-            }}>
-              {isUpcoming ? 'Open in Google Calendar' : 'Add to Google Calendar'}
+          {/* Join button with tooltip */}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            {!isUpcoming ? <button
+              onClick={(e) => {
+                e.stopPropagation(); // Stop event from bubbling
+                handleJoinClick(e);
+              }}
+              style={{
+                backgroundColor: colors.accent,
+                color: '#fff',
+                border: 'none',
+                width: '140px',
+                height: '48px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                transition: 'all 0.3s ease',
+                padding: '0 12px',
+                outline: 'none',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+                borderRadius: '12px',
+                position: 'relative',
+                overflow: 'hidden',
+                flexShrink: 0,
+                transform: 'scale(1)'
+              }}
+              onMouseOver={(e) => {
+                e.stopPropagation(); // Stop event from bubbling
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.25)';
+                setShowTooltip(true);
+              }}
+              onMouseOut={(e) => {
+                e.stopPropagation(); // Stop event from bubbling
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+                setShowTooltip(false);
+              }}
+              onFocus={() => setShowTooltip(true)}
+              onBlur={() => setShowTooltip(false)}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                {isUpcoming ? <CheckIcon /> : <CalendarIcon />}
+                <span>Join!</span>
+              </span>
+            </button> : <div></div>}
+            
+            {/* Tooltip */}
+            {showTooltip && (
               <div style={{
                 position: 'absolute',
-                top: '100%',
+                bottom: '100%',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: 0,
-                height: 0,
-                borderLeft: '6px solid transparent',
-                borderRight: '6px solid transparent',
-                borderTop: '6px solid rgba(0, 0, 0, 0.75)'
-              }} />
-            </div>
-          )}
+                marginBottom: '8px',
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                color: '#fff',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                zIndex: 10,
+                pointerEvents: 'none'
+              }}>
+                {isUpcoming ? 'Open in Google Calendar' : 'Add to Google Calendar'}
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '6px solid transparent',
+                  borderRight: '6px solid transparent',
+                  borderTop: '6px solid rgba(0, 0, 0, 0.75)'
+                }} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      
+      {/* Meeting Details Modal */}
+      {showModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+            backdropFilter: 'blur(3px)'
+          }}
+          onClick={handleCloseModal}
+        >
+          {/* Modal Content */}
+          <div 
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '16px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+              width: '90%',
+              maxWidth: '550px',
+              maxHeight: '90vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+              animation: 'fadeIn 0.3s ease forwards'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with color from the meeting */}
+            <div 
+              style={{
+                backgroundColor: colors.main,
+                color: colors.text,
+                padding: '24px',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}
+            >
+              {/* Decorative left stripe */}
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '0',
+                  left: '0',
+                  width: '8px',
+                  height: '100%',
+                  backgroundColor: colors.stripe,
+                  zIndex: 1
+                }}
+              />
+              
+              {/* Close button */}
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                  color: '#fff',
+                  border: 'none',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  zIndex: 2,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                ✕
+              </button>
+              
+              <h2 style={{ margin: 0, fontSize: '28px', fontWeight: '700' }}>
+                {suggestedMeeting.assignment} Meeting
+              </h2>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
+                    borderRadius: '50%', 
+                    width: '32px', 
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="3" y="4" width="18" height="18" rx="2" stroke="white" strokeWidth="2"/>
+                      <path d="M3 10H21" stroke="white" strokeWidth="2"/>
+                      <path d="M16 2V6" stroke="white" strokeWidth="2"/>
+                      <path d="M8 2V6" stroke="white" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  <span style={{ fontWeight: '500' }}>{suggestedMeeting.date}</span>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
+                    borderRadius: '50%', 
+                    width: '32px', 
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="2"/>
+                      <path d="M12 6V12L16 14" stroke="white" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  <span style={{ fontWeight: '500' }}>{suggestedMeeting.time}</span>
+                </div>
+              </div>
+              
+              {suggestedMeeting.location && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
+                    borderRadius: '50%', 
+                    width: '32px', 
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="white" strokeWidth="2"/>
+                      <path d="M12 22C16 18 20 14.4183 20 10C20 5.58172 16.4183 2 12 2C7.58172 2 4 5.58172 4 10C4 14.4183 8 18 12 22Z" stroke="white" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  <span style={{ fontWeight: '500' }}>{suggestedMeeting.location}</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Actions */}
+            <div style={{ 
+              padding: '16px 24px',
+              display: 'flex',
+              gap: '12px',
+              borderBottom: '1px solid #eee'
+            }}>
+              <button
+                onClick={(e) => {
+                  handleCloseModal(e);
+                  handleJoinClick(e);
+                }}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: colors.accent,
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  gap: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <CalendarIcon />
+                Schedule with Google Calendar
+              </button>
+              
+              <button
+                onClick={handleSendGroupEmail}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f8f9fa',
+                  color: '#333',
+                  border: '1px solid #ddd',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  gap: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <EmailIcon />
+                Email Group
+              </button>
+            </div>
+            
+            {/* Members list */}
+            <div style={{ 
+              padding: '24px',
+              overflow: 'auto',
+              flex: '1'
+            }}>
+              <h3 style={{ 
+                margin: '0 0 16px 0', 
+                fontSize: '18px', 
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Group Members
+              </h3>
+              
+              <div style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                {getMembers().map((member, index) => (
+                  <div 
+                    key={index}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: colors.main,
+                        color: '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: '600',
+                        fontSize: '16px'
+                      }}>
+                        {member.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p style={{ margin: '0', fontWeight: '600', fontSize: '16px' }}>{member.name}</p>
+                        {member.email && <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>{member.email}</p>}
+                      </div>
+                    </div>
+                    
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      backgroundColor: member.isFriend ? 'rgba(71, 209, 133, 0.1)' : 'transparent',
+                      padding: '4px 10px',
+                      borderRadius: '50px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: member.isFriend ? '#47D185' : '#999'
+                    }}>
+                      <FriendIcon isFriend={member.isFriend} />
+                      {member.isFriend ? 'Friend' : 'Add Friend'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
