@@ -92,8 +92,80 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
           zIndex: 1
         }}
       />
-
-      {/* Top row with Date/Assignment and Due Date/Join */}
+      
+      {/* Top section with headers - Date, Assignment, and Due Date */}
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        width: '100%',
+        height: '30px',
+        position: 'relative',
+        zIndex: 2,
+        marginBottom: '8px'
+      }}>
+        {/* Date header */}
+        <div style={{
+          marginBottom: '0',
+          fontSize: '15px',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+          opacity: '0.7',
+          textAlign: 'left',
+          minWidth: '180px',
+          marginRight: '24px',
+          alignSelf: 'flex-end'
+        }}>
+          Date
+        </div>
+        
+        {/* Assignment header */}
+        <div style={{
+          marginBottom: '0',
+          fontSize: '15px',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+          opacity: '0.7',
+          flex: 1,
+          textAlign: 'left',
+          alignSelf: 'flex-end'
+        }}>
+          Assignment
+        </div>
+        
+        {/* Due date section */}
+        <div style={{ 
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.25)',
+          padding: '7.5px 16px',
+          borderRadius: '24px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+          height: '24px',
+          flexShrink: 0,
+          marginLeft: '15px'
+        }}>
+          <div style={{
+            display: 'inline-block',
+            width: '10px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: colors.accent,
+            marginRight: '8px'
+          }}></div>
+          <p style={{ 
+            margin: 0, 
+            fontWeight: 'bold', 
+            fontSize: '16px' 
+          }}>
+            Due: {suggestedMeeting.dueDate}
+          </p>
+        </div>
+      </div>
+      
+      {/* Main content row with Date and Assignment */}
       <div style={{ 
         display: 'flex', 
         flexDirection: 'row', 
@@ -103,197 +175,110 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
         zIndex: 2,
         marginBottom: '16px'
       }}>
-        {/* Left side - Date and Assignment */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          flex: 1,
-          marginRight: '20px'
+        {/* Date and Time section */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          minWidth: '180px',
+          marginRight: '24px'
         }}>
-          {/* Date and Time section */}
-          <div style={{ 
+          {/* Date and Time with calendar icon */}
+          <div style={{
             display: 'flex', 
-            flexDirection: 'column', 
-            minWidth: '200px',
-            marginRight: '24px'
+            alignItems: 'center', 
+            padding: '12px 16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.18)',
+            backdropFilter: 'blur(5px)',
+            borderRadius: '12px',
+            textAlign: 'left',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            height: '56px'
           }}>
-            {/* Date and Time with calendar icon */}
             <div style={{
-              display: 'flex', 
-              alignItems: 'center', 
-              padding: '12px 16px',
-              backgroundColor: 'rgba(255, 255, 255, 0.18)',
-              backdropFilter: 'blur(5px)',
-              borderRadius: '12px',
-              textAlign: 'left',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              height: '80px'
+              borderLeft: `4px solid ${colors.accent}`,
+              paddingLeft: '10px'
             }}>
-              <div style={{
-                borderLeft: `4px solid ${colors.accent}`,
-                paddingLeft: '10px'
-              }}>
-                <p style={{ 
-                  margin: '0', 
-                  fontSize: '20px', 
-                  fontWeight: '700',
-                  letterSpacing: '-0.3px',
-                  textAlign: 'left'
-                }}>
-                  {suggestedMeeting.date}
-                </p>
-                <p style={{ 
-                  margin: '2px 0 0 0', 
-                  fontSize: '16px', 
-                  opacity: '0.9',
-                  fontWeight: '500'
-                }}>
-                  {suggestedMeeting.time}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Assignment section */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            flex: 1
-          }}>
-            {/* Assignment label with visual indicator */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              width: '100%'
-            }}>
-              <div style={{
-                marginBottom: '8px',
-                fontSize: '15px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                opacity: '0.7'
-              }}>
-                Assignment
-              </div>
-              <div style={{ 
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '14px',
-                fontSize: '1.7em',
+              <p style={{ 
+                margin: '0', 
+                fontSize: '20px', 
                 fontWeight: '700',
-                letterSpacing: '-0.5px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
-                backdropFilter: 'blur(3px)',
-                minHeight: '56px'
+                letterSpacing: '-0.3px',
+                textAlign: 'left'
               }}>
-                {suggestedMeeting.assignment}
-              </div>
+                {suggestedMeeting.date}
+              </p>
+              <p style={{ 
+                margin: '2px 0 0 0', 
+                fontSize: '16px', 
+                opacity: '0.9',
+                fontWeight: '500'
+              }}>
+                {suggestedMeeting.time}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Right side - Due Date and Join Button */}
+        {/* Assignment content */}
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column', 
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          minWidth: '160px',
-          paddingLeft: '20px'
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          flex: 1,
+          width: '100%'
         }}>
-          {/* Due date with alert icon */}
           <div style={{ 
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            padding: '10px 16px',
-            borderRadius: '24px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-            marginBottom: '12px'
+            justifyContent: 'flex-start',
+            width: '100%',
+            height: '56px',
+            padding: '12px 16px',
+            borderRadius: '14px',
+            fontSize: '2em',
+            fontWeight: '700',
+            letterSpacing: '-0.5px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
+            backdropFilter: 'blur(3px)',
+            boxSizing: 'border-box'
           }}>
-            <div style={{
-              display: 'inline-block',
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: colors.accent,
-              marginRight: '8px'
-            }}></div>
-            <p style={{ 
-              margin: 0, 
-              fontWeight: 'bold', 
-              fontSize: '16px' 
-            }}>
-              Due: {suggestedMeeting.dueDate}
-            </p>
+            {suggestedMeeting.assignment}
           </div>
-          
-          {/* Join button */}
-          <button
-            onClick={onAdd}
-            style={{
-              backgroundColor: colors.accent,
-              color: '#fff',
-              border: 'none',
-              width: '120px',
-              height: '48px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '18px',
-              transition: 'all 0.3s ease',
-              padding: 0,
-              outline: 'none',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-              borderRadius: '12px',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.transform = 'scale(1.05)';
-              e.target.style.boxShadow = '0 6px 12px rgba(0,0,0,0.25)';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.transform = 'scale(1)';
-              e.target.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-            }}
-          >
-            Join!
-          </button>
         </div>
       </div>
 
       {/* Bottom row - Attendees section */}
       <div style={{ 
         display: 'flex',
-        width: 'calc(100% - 180px)', /* Leaves space for the right column */
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%', 
         padding: '16px 20px',
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         borderRadius: '12px',
         position: 'relative',
         zIndex: 2,
-        backdropFilter: 'blur(3px)'
+        backdropFilter: 'blur(3px)',
+        boxSizing: 'border-box'
       }}>
         <div style={{
           display: 'flex',
-          flexDirection: 'column',
-          width: '100%'
+          flexDirection: 'row',
+          flex: 1,
+          gap: '10px',
+          alignItems: 'center',
+          marginRight: '15px',
+          minWidth: 0,
+          overflow: 'hidden'
         }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            marginBottom: '8px'
+            justifyContent: 'center',
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}>
             <div style={{
               width: '6px',
@@ -318,11 +303,49 @@ const SuggestedMeeting = ({ suggestedMeeting, onAdd, colorScheme }) => {
             margin: '0',
             fontSize: '16px',
             fontWeight: '500',
-            lineHeight: '1.5'
+            lineHeight: '1.5',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
           }}>
             {suggestedMeeting.attendees}
           </p>
         </div>
+        {/* Join button */}
+        <button
+            onClick={onAdd}
+            style={{
+              backgroundColor: colors.accent,
+              color: '#fff',
+              border: 'none',
+              width: '120px',
+              height: '48px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: '18px',
+              transition: 'all 0.3s ease',
+              padding: 0,
+              outline: 'none',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+              borderRadius: '12px',
+              position: 'relative',
+              overflow: 'hidden',
+              flexShrink: 0
+            }}
+            onMouseOver={(e) => {
+              e.target.style.transform = 'scale(1.05)';
+              e.target.style.boxShadow = '0 6px 12px rgba(0,0,0,0.25)';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+            }}
+          >
+            Join!
+          </button>
       </div>
     </div>
   );
