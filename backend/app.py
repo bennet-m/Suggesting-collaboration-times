@@ -1,16 +1,15 @@
 from flask import Flask, redirect, request, session, jsonify
 from oauth import get_flow, get_credentials, get_user_data
 from models import User
-from db_utils import get_suggestions, send_user, get_users_with_same_assignment, create_user_firestore, fetch_user_free_times_before_due
+from db_utils import get_suggestions, send_user, get_users_with_same_assignment, create_user, fetch_user_free_times_before_due
 from oauth import get_user_data
 from flask_cors import CORS
-
-from firebase_admin import firestore
-db = firestore.client()
-
+import json
+from datetime import datetime
+import os
 
 app = Flask(__name__)
-app.secret_key = "dev-key"  
+app.secret_key = "dev-key"
 
 # Update to allow both localhost and 127.0.0.1
 FRONTEND_URL = ["http://localhost:3000", "http://127.0.0.1:3000"]
@@ -50,18 +49,56 @@ def main_logic():
     suggestions = get_suggestions(user)
     return jsonify(suggestions)
 
+@app.route("/api/suggestions", methods=["POST"])
+def get_suggestions_endpoint():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
+    user = {
+        "name": data.get("name"),
+        "email": data.get("email"),
+        "assignments": data.get("assignments", []),
+        "free_time": data.get("free_time", [])
+    }
 
+    suggestions = get_suggestions(user)
+    return jsonify({"suggestions": suggestions})
 
+@app.route("/api/user", methods=["POST"])
+def create_user_endpoint():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
+    name = data.get("name")
+    email = data.get("email")
 
+    if not name or not email:
+        return jsonify({"error": "Name and email are required"}), 400
 
+    create_user(name, email)
+    return f"✅ User {name} saved to local storage!"
 
+@app.route("/api/user/<email>", methods=["GET"])
+def get_user_endpoint(email):
+    try:
+        with open("data.json", "r") as f:
+            data = json.load(f)
+            if email in data["users"]:
+                return jsonify(data["users"][email])
+            return jsonify({"error": "User not found"}), 404
+    except FileNotFoundError:
+        return jsonify({"error": "No users found"}), 404
 
-
-
-
-
+@app.route("/api/assignments", methods=["GET"])
+def get_assignments_endpoint():
+    try:
+        with open("data.json", "r") as f:
+            data = json.load(f)
+            return jsonify(data["assignments"])
+    except FileNotFoundError:
+        return jsonify({"assignments": {}})
 
 # test get users with the same assignment
 @app.route('/who_is_doing')
@@ -79,17 +116,16 @@ def who_is_doing():
 def test_save_user():
     name = "Test User"
     email = "testuser@example.com"
-    create_user_firestore(name, email)
+    create_user(name, email)
 
     name = "Alice"
     email = "alice@example.com"
-    create_user_firestore(name, email)
+    create_user(name, email)
 
     name = "Bob"
     email = "bob@example.com"
-    create_user_firestore(name, email)  
-    return f"✅ User {name} saved to Firestore!"
-
+    create_user(name, email)  
+    return f"✅ User {name} saved to local storage!"
 
 @app.route('/test_free_times_before_due')
 def test_free_times_before_due():
@@ -115,40 +151,36 @@ def test_free_times_before_due():
 @app.route('/test_suggestions')
 def test_suggestions():
     try:
-        # Get Alice's user document
-        doc = db.collection("users").document("alice@example.com").get()
-        if not doc.exists:
-            return jsonify({"error": "User not found"}), 404
-
-        user_data = doc.to_dict()
-
-        # Assuming you have a basic User class like this:
-        user = User(
-            name="Aaara",
-            email="Aaara@example.com",
-            assignments=[
+        # Create a test user
+        user = {
+            "name": "Aaara",
+            "email": "Aaara@example.com",
+            "assignments": [
                 { "title": "CS225 Assignment 2", "due": "2025-04-07T23:59" },
                 { "title": "MATH241 Quiz", "due": "2025-04-09T12:00" }
             ],
-            free_time= [("2025-04-06T14:00", "2025-04-06T15:00"), ("2025-04-07T16:00",  "2025-04-07T17:00"), ("2025-04-08T10:00", "2025-04-08T11:00")
+            "free_time": [
+                { "start": "2025-04-06T14:00", "end": "2025-04-06T15:00" },
+                { "start": "2025-04-07T16:00", "end": "2025-04-07T17:00" },
+                { "start": "2025-04-08T10:00", "end": "2025-04-08T11:00" }
             ]
-        )
+        }
         
         print("sending user")
-        send_user(user) #issue is this line
+        send_user(user)
         print("sent user successful")
+        
         # Run the main suggestion logic
         suggestions = get_suggestions(user)
         print("get suggestion successful")
 
         return jsonify({
-            "user": user.email,
+            "user": user["email"],
             "suggestions": suggestions
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)

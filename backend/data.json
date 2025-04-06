@@ -1,1 +1,352 @@
- 
+{
+    "users": {
+        "bmatazzoni@g.hmc.edu": {
+            "name": "Bennet Matazzoni",
+            "email": "bmatazzoni@g.hmc.edu",
+            "assignments": [
+                {
+                    "title": "Quiz 2",
+                    "due": "2025-04-07T18:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "Homework 8: Approximate Inference + VPI",
+                    "due": "2025-04-08T04:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "Homework 8: Approximate Inference + VPI",
+                    "due": "2025-04-09T04:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "Project Status Update #1",
+                    "due": "2025-04-09T23:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "CS225 Assignment 2",
+                    "due": "2025-04-08T00:30:00-07:00",
+                    "description": null
+                },
+                {
+                    "title": "Homework 8: Approximate Inference + VPI [HM CSCI 151.1 SP25]",
+                    "due": "2025-04-08T04:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "Project Status Update #1 [HMC CSCI 158 SP25]",
+                    "due": "2025-04-09T23:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "Comput Practices/Projects/People",
+                    "due": "2025-04-08T16:00:00-07:00",
+                    "description": null
+                },
+                {
+                    "title": "Comput Practices/Projects/People",
+                    "due": "2025-04-10T16:00:00-07:00",
+                    "description": null
+                },
+                {
+                    "title": "homework 7",
+                    "due": "2025-04-11T11:00:00-07:00",
+                    "description": null
+                },
+                {
+                    "title": "Comput Practices/Projects/People",
+                    "due": "2025-04-15T16:00:00-07:00",
+                    "description": null
+                },
+                {
+                    "title": "Comput Practices/Projects/People",
+                    "due": "2025-04-17T16:00:00-07:00",
+                    "description": null
+                }
+            ],
+            "free_time": [
+                {
+                    "start": "2025-04-06T08:00:00+00:00",
+                    "end": "2025-04-06T23:59:00+00:00"
+                },
+                {
+                    "start": "2025-04-07T08:00:00+00:00",
+                    "end": "2025-04-07T09:35:00-07:00"
+                },
+                {
+                    "start": "2025-04-07T12:15:00-07:00",
+                    "end": "2025-04-07T12:45:00-07:00"
+                },
+                {
+                    "start": "2025-04-07T14:00:00-07:00",
+                    "end": "2025-04-07T14:15:00-07:00"
+                },
+                {
+                    "start": "2025-04-07T14:30:00-07:00",
+                    "end": "2025-04-07T16:30:00-07:00"
+                },
+                {
+                    "start": "2025-04-08T08:00:00+00:00",
+                    "end": "2025-04-08T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-08T13:00:00-07:00",
+                    "end": "2025-04-08T14:45:00-07:00"
+                },
+                {
+                    "start": "2025-04-08T16:00:00-07:00",
+                    "end": "2025-04-08T16:15:00-07:00"
+                },
+                {
+                    "start": "2025-04-09T08:00:00+00:00",
+                    "end": "2025-04-09T09:35:00-07:00"
+                },
+                {
+                    "start": "2025-04-10T08:00:00+00:00",
+                    "end": "2025-04-10T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-10T13:00:00-07:00",
+                    "end": "2025-04-10T14:45:00-07:00"
+                },
+                {
+                    "start": "2025-04-10T16:00:00-07:00",
+                    "end": "2025-04-10T16:15:00-07:00"
+                },
+                {
+                    "start": "2025-04-11T08:00:00+00:00",
+                    "end": "2025-04-11T10:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-11T12:15:00-07:00",
+                    "end": "2025-04-11T23:59:00+00:00"
+                },
+                {
+                    "start": "2025-04-12T08:00:00+00:00",
+                    "end": "2025-04-12T23:59:00+00:00"
+                },
+                {
+                    "start": "2025-04-13T08:00:00+00:00",
+                    "end": "2025-04-13T23:59:00+00:00"
+                },
+                {
+                    "start": "2025-04-14T08:00:00+00:00",
+                    "end": "2025-04-14T09:35:00-07:00"
+                },
+                {
+                    "start": "2025-04-14T10:50:00-07:00",
+                    "end": "2025-04-14T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-14T12:15:00-07:00",
+                    "end": "2025-04-14T12:45:00-07:00"
+                },
+                {
+                    "start": "2025-04-14T14:00:00-07:00",
+                    "end": "2025-04-14T16:30:00-07:00"
+                },
+                {
+                    "start": "2025-04-15T08:00:00+00:00",
+                    "end": "2025-04-15T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-15T13:00:00-07:00",
+                    "end": "2025-04-15T14:45:00-07:00"
+                },
+                {
+                    "start": "2025-04-15T16:00:00-07:00",
+                    "end": "2025-04-15T16:15:00-07:00"
+                },
+                {
+                    "start": "2025-04-16T08:00:00+00:00",
+                    "end": "2025-04-16T09:35:00-07:00"
+                },
+                {
+                    "start": "2025-04-16T10:50:00-07:00",
+                    "end": "2025-04-16T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-16T12:15:00-07:00",
+                    "end": "2025-04-16T13:15:00-07:00"
+                },
+                {
+                    "start": "2025-04-17T08:00:00+00:00",
+                    "end": "2025-04-17T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-17T13:00:00-07:00",
+                    "end": "2025-04-17T14:45:00-07:00"
+                },
+                {
+                    "start": "2025-04-17T16:00:00-07:00",
+                    "end": "2025-04-17T16:15:00-07:00"
+                },
+                {
+                    "start": "2025-04-18T08:00:00+00:00",
+                    "end": "2025-04-18T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-18T12:15:00-07:00",
+                    "end": "2025-04-18T13:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-18T14:30:00-07:00",
+                    "end": "2025-04-18T23:59:00+00:00"
+                },
+                {
+                    "start": "2025-04-19T08:00:00+00:00",
+                    "end": "2025-04-19T23:59:00+00:00"
+                }
+            ]
+        },
+        "akumar@g.hmc.edu": {
+            "name": "Anika Kumar",
+            "email": "akumar@g.hmc.edu",
+            "assignments": [
+                {
+                    "title": "Homework 8: Approximate Inference + VPI",
+                    "due": "2025-04-08T04:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "Project Status Update #1",
+                    "due": "2025-04-09T23:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "CS225 Assignment 2",
+                    "due": "2025-04-08T00:30:00-07:00",
+                    "description": null
+                }
+            ],
+            "free_time": [
+                {
+                    "start": "2025-04-08T08:00:00+00:00",
+                    "end": "2025-04-08T11:00:00-07:00"
+                },
+                {
+                    "start": "2025-04-09T08:00:00+00:00",
+                    "end": "2025-04-09T09:35:00-07:00"
+                }
+            ]
+        },
+        "jchavez@g.hmc.edu": {
+            "name": "Jorge Chavez",
+            "email": "jchavez@g.hmc.edu",
+            "assignments": [
+                {
+                    "title": "Quiz 2",
+                    "due": "2025-04-07T18:00:00+00:00",
+                    "description": null
+                },
+                {
+                    "title": "homework 7",
+                    "due": "2025-04-11T11:00:00-07:00",
+                    "description": null
+                }
+            ],
+            "free_time": [
+                {
+                    "start": "2025-04-07T14:30:00-07:00",
+                    "end": "2025-04-07T16:30:00-07:00"
+                },
+                {
+                    "start": "2025-04-11T12:15:00-07:00",
+                    "end": "2025-04-11T23:59:00+00:00"
+                }
+            ]
+        }
+    },
+    "assignments": {
+        "quiz-2-2025-04-07t18-00-00-00-00": {
+            "title": "Quiz 2",
+            "due": "2025-04-07T18:00:00+00:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu",
+                "jchavez@g.hmc.edu"
+            ]
+        },
+        "homework-8-approximate-inference-vpi-2025-04-08t04-00-00-00-00": {
+            "title": "Homework 8: Approximate Inference + VPI",
+            "due": "2025-04-08T04:00:00+00:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu",
+                "akumar@g.hmc.edu"
+            ]
+        },
+        "project-status-update-1-2025-04-09t23-00-00-00-00": {
+            "title": "Project Status Update #1",
+            "due": "2025-04-09T23:00:00+00:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu",
+                "akumar@g.hmc.edu"
+            ]
+        },
+        "cs225-assignment-2-2025-04-08t00-30-00-07-00": {
+            "title": "CS225 Assignment 2",
+            "due": "2025-04-08T00:30:00-07:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu",
+                "akumar@g.hmc.edu"
+            ]
+        },
+        "homework-7-2025-04-11t11-00-00-07-00": {
+            "title": "homework 7",
+            "due": "2025-04-11T11:00:00-07:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu",
+                "jchavez@g.hmc.edu"
+            ]
+        },
+        "homework-8-approximate-inference-vpi-2025-04-09t04-00-00-00-00": {
+            "title": "Homework 8: Approximate Inference + VPI",
+            "due": "2025-04-09T04:00:00+00:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        },
+        "homework-8-approximate-inference-vpi-hm-csci-151-1-sp25-2025-04-08t04-00-00-00-00": {
+            "title": "Homework 8: Approximate Inference + VPI [HM CSCI 151.1 SP25]",
+            "due": "2025-04-08T04:00:00+00:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        },
+        "project-status-update-1-hmc-csci-158-sp25-2025-04-09t23-00-00-00-00": {
+            "title": "Project Status Update #1 [HMC CSCI 158 SP25]",
+            "due": "2025-04-09T23:00:00+00:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        },
+        "comput-practices-projects-people-2025-04-08t16-00-00-07-00": {
+            "title": "Comput Practices/Projects/People",
+            "due": "2025-04-08T16:00:00-07:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        },
+        "comput-practices-projects-people-2025-04-10t16-00-00-07-00": {
+            "title": "Comput Practices/Projects/People",
+            "due": "2025-04-10T16:00:00-07:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        },
+        "comput-practices-projects-people-2025-04-15t16-00-00-07-00": {
+            "title": "Comput Practices/Projects/People",
+            "due": "2025-04-15T16:00:00-07:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        },
+        "comput-practices-projects-people-2025-04-17t16-00-00-07-00": {
+            "title": "Comput Practices/Projects/People",
+            "due": "2025-04-17T16:00:00-07:00",
+            "students": [
+                "bmatazzoni@g.hmc.edu"
+            ]
+        }
+    }
+}
