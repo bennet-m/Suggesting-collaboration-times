@@ -148,7 +148,7 @@ def send_user(user: User):
         due = assignment.get("end")
         if isinstance(due, str):
             due = datetime.fromisoformat(due)
-        add_assignment_to_user(user.email, assignment.get("summary"), due)
+        add_assignment_to_user(user.email, assignment.get("title", assignment.get("summary")), due)
     
     for start, end in user.free_time:
         if isinstance(start, str):
@@ -222,7 +222,7 @@ def get_suggestions(user: User):
     suggestions = []
 
     for assignment in user.assignments:
-        title = assignment.get("title")
+        title = assignment.get("title", assignment.get("summary"))
         due = assignment.get("due")
         if isinstance(due, str):
             due = datetime.fromisoformat(due)
