@@ -48,8 +48,6 @@ def get_credentials():
             pickle.dump(creds, token)
 
     return creds
-# def get_credentials():
-#     return Credentials(**session["credentials"])
 
 def get_user_data(creds):
     service = build("calendar", "v3", credentials=creds)
